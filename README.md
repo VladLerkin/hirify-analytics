@@ -10,6 +10,7 @@
 
 - 📊 **Interactive Analytics Dashboards** - Visualize real-time job market data and HR metrics.
 - 🔍 **Vacancy Filtering** - Deep dive into specializations, skills, formats, and regions.
+- 🎤 **Voice Input (AI)** - Use offline (Vosk) or cloud (Whisper, Google, Yandex) speech recognition to enter filters by voice.
 - 🎨 **Modern UI** - Built with Compose Multiplatform for a native look and feel on every platform.
 - ⚡️ **High Performance** - Native compilation guarantees fast processing of massive analytics datasets.
 - 🌐 **Cross-Platform** - Available on Desktop, Web, Android, and iOS.

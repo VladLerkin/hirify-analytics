@@ -58,3 +58,7 @@ app-android/src/main/assets/files/
 kotlin-js-store/
 
 docs/PARTNER-ANALYTICS-API.md
+
+target/
+
+.mvn/
