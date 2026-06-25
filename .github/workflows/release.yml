@@ -1,0 +1,219 @@
+name: Publish Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '25'
+          cache: 'gradle'
+      
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      
+      - name: Setup and Build Android Release
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::warning::No KEYSTORE_BASE64 found. Using DUMMY mode for testing."
+            export RELEASE_STORE_PASSWORD="android123"
+            export RELEASE_KEY_ALIAS="release"
+            export RELEASE_KEY_PASSWORD="android123"
+            
+            keytool -genkey -v -keystore app-android/release.keystore \
+              -alias "$RELEASE_KEY_ALIAS" \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass "$RELEASE_STORE_PASSWORD" \
+              -keypass "$RELEASE_KEY_PASSWORD" \
+              -dname "CN=Dummy, OU=Dummy, O=Dummy, L=Dummy, ST=Dummy, C=US"
+          else
+            echo "KEYSTORE_BASE64 found. Decoding..."
+            # Use printf to avoid adding a newline, and -di to be more robust
+            printf '%s' "$KEYSTORE_BASE64" | base64 -di > app-android/release.keystore
+            
+            echo "Checking environment variables (presence only)..."
+            if [ -z "$RELEASE_STORE_PASSWORD" ]; then echo "::error::RELEASE_STORE_PASSWORD is MISSING!"; fi
+            if [ -z "$RELEASE_KEY_ALIAS" ]; then echo "::error::RELEASE_KEY_ALIAS is MISSING!"; fi
+            if [ -z "$RELEASE_KEY_PASSWORD" ]; then echo "::error::RELEASE_KEY_PASSWORD is MISSING!"; fi
+            
+            # Verify keystore file size
+            echo "Keystore file size: $(stat -c%s app-android/release.keystore) bytes"
+          fi
+          
+          ./gradlew :app-android:assembleRelease
+      
+      - name: Verify APK Signature
+        run: |
+          APKSIGNER=$(find $ANDROID_HOME/build-tools -name "apksigner" | sort -r | head -n 1)
+          if [ -z "$APKSIGNER" ]; then
+            APKSIGNER=$(find $ANDROID_HOME/build-tools -name "apksigner.jar" | sort -r | head -n 1)
+            echo "Using apksigner jar: $APKSIGNER"
+            java -jar "$APKSIGNER" verify --print-certs app-android/build/outputs/apk/release/app-android-release.apk
+          else
+            echo "Using apksigner tool: $APKSIGNER"
+            "$APKSIGNER" verify --print-certs app-android/build/outputs/apk/release/app-android-release.apk
+          fi
+      
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release
+          path: app-android/build/outputs/apk/release/*.apk
+
+  build-desktop:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            task: packageReleaseDeb
+            suffix: linux
+          - os: macos-latest
+            task: packageReleaseDmg
+            suffix: mac
+          - os: windows-latest
+            task: packageReleaseMsi
+            suffix: windows
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '25'
+          cache: 'gradle'
+      
+      - name: Grant execute permission for gradlew (Unix)
+        if: runner.os != 'Windows'
+        run: chmod +x gradlew
+      
+      - name: Package Desktop
+        run: ./gradlew :app-desktop:${{ matrix.task }}
+        shell: bash
+
+      - name: List Desktop Build Output
+        run: find app-desktop/build/compose/binaries -maxdepth 4
+        shell: bash
+        continue-on-error: true
+      
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.suffix }}
+          path: app-desktop/build/compose/binaries/main-release/*/*
+
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '25'
+          cache: 'gradle'
+      
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Set correct JAVA_HOME for Xcode
+        run: |
+          JAVA_HOME_PATH=$(/usr/libexec/java_home -v 25)
+          echo "JAVA_HOME=$JAVA_HOME_PATH" >> $GITHUB_ENV
+      
+      - name: Select Xcode version
+        run: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+
+      - name: Build iOS App (Archive)
+        working-directory: iosApp
+        run: |
+          xcodebuild -project iosApp.xcodeproj \
+            -scheme iosApp \
+            -sdk iphoneos \
+            -configuration Release \
+            -derivedDataPath build \
+            archive \
+            -archivePath build/iosApp.xcarchive \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Zip Archive
+        run: |
+          if [ -d "iosApp/build/iosApp.xcarchive" ]; then
+            zip -r ios-app-archive.zip iosApp/build/iosApp.xcarchive
+          else
+            echo "Archive not found, skipping zip"
+          fi
+      
+      - name: Upload Artifact
+        if: hashFiles('ios-app-archive.zip') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-archive
+          path: ios-app-archive.zip
+
+  publish-release:
+    needs: [build-android, build-desktop, build-ios]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      
+      - name: Display structure of downloaded files
+        run: ls -R artifacts
+
+      - name: Extract Desktop Artifacts
+        run: |
+          mkdir -p release-files
+          # Extract and copy desktop files
+          if [ -d "artifacts/desktop-linux" ]; then
+            find artifacts/desktop-linux -name "*.deb" -exec cp {} release-files/ \;
+          fi
+          if [ -d "artifacts/desktop-mac" ]; then
+            find artifacts/desktop-mac -name "*.dmg" -exec cp {} release-files/ \;
+          fi
+          if [ -d "artifacts/desktop-windows" ]; then
+            find artifacts/desktop-windows -name "*.msi" -exec cp {} release-files/ \;
+          fi
+          # Copy other files
+          cp artifacts/android-release/*.apk release-files/ 2>/dev/null || true
+          cp artifacts/ios-archive/*.zip release-files/ 2>/dev/null || true
+          ls -lh release-files/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release-files/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
