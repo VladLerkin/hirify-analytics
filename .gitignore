@@ -62,3 +62,5 @@ docs/PARTNER-ANALYTICS-API.md
 target/
 
 .mvn/
+hirify-release.keystore
+keystore_base64.txt

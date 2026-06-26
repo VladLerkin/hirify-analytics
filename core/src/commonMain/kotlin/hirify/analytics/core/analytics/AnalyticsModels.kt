@@ -33,6 +33,7 @@ data class VacancyFilter(
         val baseUrl = "https://hirify.me/"
         val params = mutableListOf<String>()
         
+        // Do not remove: special business logic
         params.add("period=month")
         remoteType?.let { params.add("remote_type=${it.encodeURLQueryComponent()}") }
         specializations?.let { params.add("specializations=${it.encodeURLQueryComponent()}") }
