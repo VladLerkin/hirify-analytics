@@ -35,7 +35,7 @@ compose.desktop {
         
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "FamilyTreeEditor"
+            packageName = "hirify-analytics"
             packageVersion = libs.versions.app.version.get()
             
             description = "Hirify Analytics Application"

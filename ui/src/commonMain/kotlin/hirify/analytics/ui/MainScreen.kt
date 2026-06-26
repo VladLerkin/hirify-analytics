@@ -17,6 +17,9 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.OpenInBrowser
+import androidx.compose.ui.platform.LocalUriHandler
 import hirify.analytics.ui.components.panels.LeftSidebar
 import hirify.analytics.ui.render.ChartRenderer
 import org.koin.compose.koinInject
@@ -69,6 +72,13 @@ fun MainScreen() {
                             ) {
                                 Text(if (isRecording) "Stop Recording" else "Voice Dictation", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
                             }
+                        }
+                        val uriHandler = LocalUriHandler.current
+                        IconButton(onClick = { uriHandler.openUri(state.filter.toHirifyWebUrl()) }) {
+                            Icon(Icons.Filled.OpenInBrowser, contentDescription = "Open in browser")
+                        }
+                        IconButton(onClick = { navigator.push(AboutScreen()) }) {
+                            Icon(Icons.Filled.Info, contentDescription = "About")
                         }
                         IconButton(onClick = { navigator.push(AiSettingsScreen()) }) {
                             Icon(androidx.compose.material.icons.Icons.Filled.Settings, contentDescription = "Settings")

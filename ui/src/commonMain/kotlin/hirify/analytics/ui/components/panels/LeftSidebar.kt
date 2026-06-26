@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.clickable
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -16,7 +17,7 @@ import hirify.analytics.core.analytics.VacancyFilter
 import hirify.analytics.core.analytics.HirifyApiClient
 import org.koin.compose.koinInject
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun LeftSidebar(
     filter: VacancyFilter,
@@ -42,7 +43,7 @@ fun LeftSidebar(
 
         // Work Format
         FilterSection("Формат работы") {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 MultiSelectChip("Удаленно", "remote", filter.workFormat) { onFilterChanged(filter.copy(workFormat = it)) }
                 MultiSelectChip("Гибрид", "hybrid", filter.workFormat) { onFilterChanged(filter.copy(workFormat = it)) }
                 MultiSelectChip("В офисе", "onsite", filter.workFormat) { onFilterChanged(filter.copy(workFormat = it)) }
@@ -51,7 +52,7 @@ fun LeftSidebar(
 
         // Remote Type
         FilterSection("Тип удаленки") {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 MultiSelectChip("Глобал", "global", filter.remoteType) { onFilterChanged(filter.copy(remoteType = it)) }
                 MultiSelectChip("РФ", "russia", filter.remoteType) { onFilterChanged(filter.copy(remoteType = it)) }
                 MultiSelectChip("Европа", "europe", filter.remoteType) { onFilterChanged(filter.copy(remoteType = it)) }
@@ -99,30 +100,25 @@ fun LeftSidebar(
 
         // Grade
         FilterSection("Грейд") {
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    MultiSelectChip("Стажер", "trainee", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
-                    MultiSelectChip("Джуниор", "junior", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
-                    MultiSelectChip("Мидл", "middle", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    MultiSelectChip("Сеньор", "senior", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
-                    MultiSelectChip("Лид", "lead", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
-                    MultiSelectChip("Head", "head", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
-                }
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                MultiSelectChip("Стажер", "trainee", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
+                MultiSelectChip("Джуниор", "junior", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
+                MultiSelectChip("Мидл", "middle", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
+                MultiSelectChip("Сеньор", "senior", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
+                MultiSelectChip("Лид", "lead", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
+                MultiSelectChip("Head", "head", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
+                MultiSelectChip("Директор", "director", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
+                MultiSelectChip("C-level", "c_level", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
             }
         }
 
         // Company Type
         FilterSection("Тип компании") {
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    MultiSelectChip("Стартап", "startup", filter.companyType) { onFilterChanged(filter.copy(companyType = it)) }
-                    MultiSelectChip("Корпорация", "corporation", filter.companyType) { onFilterChanged(filter.copy(companyType = it)) }
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    MultiSelectChip("Продуктовая", "product_company", filter.companyType) { onFilterChanged(filter.copy(companyType = it)) }
-                }
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                MultiSelectChip("Стартап", "startup", filter.companyType) { onFilterChanged(filter.copy(companyType = it)) }
+                MultiSelectChip("Корпорация", "corporation", filter.companyType) { onFilterChanged(filter.copy(companyType = it)) }
+                MultiSelectChip("Продуктовая компания", "product_company", filter.companyType) { onFilterChanged(filter.copy(companyType = it)) }
+                MultiSelectChip("Аутсорс компания", "outsourcing_company", filter.companyType) { onFilterChanged(filter.copy(companyType = it)) }
             }
         }
     }
@@ -159,7 +155,6 @@ fun CompactFilterChip(
     label: String
 ) {
     Surface(
-        onClick = onClick,
         shape = MaterialTheme.shapes.small,
         color = if (selected) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent,
         contentColor = if (selected) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -168,7 +163,7 @@ fun CompactFilterChip(
     ) {
         Box(
             contentAlignment = androidx.compose.ui.Alignment.Center,
-            modifier = Modifier.padding(horizontal = 8.dp)
+            modifier = Modifier.clickable(onClick = onClick).padding(horizontal = 8.dp).fillMaxHeight()
         ) {
             Text(text = label, fontSize = 13.sp)
         }

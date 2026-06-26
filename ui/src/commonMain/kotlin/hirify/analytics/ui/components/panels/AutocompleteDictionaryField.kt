@@ -27,11 +27,21 @@ fun AutocompleteDictionaryField(
         currentValue?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() } ?: emptyList() 
     }
     
+    val codeToNameCache = remember { mutableStateMapOf<String, String>() }
     var query by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
     var suggestions by remember { mutableStateOf<List<DictionaryItem>>(emptyList()) }
     var searchJob by remember { mutableStateOf<Job?>(null) }
     val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(dictionary) {
+        val result = apiClient.searchDictionary(dictionary, "")
+        result.onSuccess { list ->
+            list.forEach { item -> 
+                item.name?.let { codeToNameCache[item.code] = it }
+            }
+        }
+    }
 
     fun performSearch(text: String, immediate: Boolean = false) {
         searchJob?.cancel()
@@ -39,6 +49,9 @@ fun AutocompleteDictionaryField(
             if (!immediate) delay(300) // debounce
             val result = apiClient.searchDictionary(dictionary, text)
             result.onSuccess { list ->
+                list.forEach { item -> 
+                    item.name?.let { codeToNameCache[item.code] = it }
+                }
                 val lowerQuery = text.lowercase()
                 val filteredList = if (lowerQuery.isNotBlank()) {
                     list.filter { item ->
@@ -125,7 +138,10 @@ fun AutocompleteDictionaryField(
                             val newItems = selectedItems - code
                             onValueChanged(if (newItems.isEmpty()) null else newItems.joinToString(","))
                         },
-                        label = { Text(code) },
+                        label = { 
+                            val displayName = codeToNameCache[code] ?: code.replace("_", " ").replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+                            Text(displayName) 
+                        },
                         trailingIcon = {
                             Icon(
                                 Icons.Default.Close,

@@ -3,6 +3,8 @@ package hirify.analytics.core.analytics
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 
+import io.ktor.http.encodeURLQueryComponent
+
 @Serializable
 data class VacancyFilter(
     val dateFrom: String? = null,
@@ -26,7 +28,25 @@ data class VacancyFilter(
     val englishLevel: String? = null,
     val country: String? = null,
     val groupBy: String? = "month"
-)
+) {
+    fun toHirifyWebUrl(): String {
+        val baseUrl = "https://hirify.me/"
+        val params = mutableListOf<String>()
+        
+        params.add("period=month")
+        remoteType?.let { params.add("remote_type=${it.encodeURLQueryComponent()}") }
+        specializations?.let { params.add("specializations=${it.encodeURLQueryComponent()}") }
+        grade?.let { params.add("grade=${it.encodeURLQueryComponent()}") }
+        companyType?.let { params.add("company_type=${it.encodeURLQueryComponent()}") }
+        workFormat?.let { params.add("work_format=${it.encodeURLQueryComponent()}") }
+        skills?.takeIf { it.isNotBlank() }?.let { skillz -> 
+            params.add("skills=${skillz.encodeURLQueryComponent()}")
+            skillsMatchType?.let { match -> params.add("skills_match_type=${match.encodeURLQueryComponent()}") }
+        }
+        
+        return if (params.isEmpty()) baseUrl else "$baseUrl?${params.joinToString("&")}"
+    }
+}
 
 @Serializable
 data class CountResponse(
