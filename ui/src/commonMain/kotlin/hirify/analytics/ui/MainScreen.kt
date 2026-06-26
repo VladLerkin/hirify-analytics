@@ -37,6 +37,7 @@ fun MainScreen() {
     val navigator = cafe.adriel.voyager.navigator.LocalNavigator.currentOrThrow
 
     var isSidebarVisible by remember { mutableStateOf(true) }
+    var showMenu by remember { mutableStateOf(false) }
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val isPortrait = maxHeight > maxWidth
@@ -49,7 +50,7 @@ fun MainScreen() {
             containerColor = MaterialTheme.colorScheme.background,
             topBar = {
                 TopAppBar(
-                    title = { Text("hirify analytics", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold) },
+                    title = { Text("hirify analytics", maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold) },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.background,
                         titleContentColor = MaterialTheme.colorScheme.onBackground
@@ -70,18 +71,61 @@ fun MainScreen() {
                                     contentColor = if (isRecording) MaterialTheme.colorScheme.onError else MaterialTheme.colorScheme.onPrimary
                                 )
                             ) {
-                                Text(if (isRecording) "Stop Recording" else "Voice Dictation", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                                val buttonText = if (isRecording) {
+                                    if (isPortrait) "Stop" else "Stop Recording"
+                                } else {
+                                    if (isPortrait) "Mic" else "Voice Dictation"
+                                }
+                                Text(buttonText, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
                             }
                         }
                         val uriHandler = LocalUriHandler.current
-                        IconButton(onClick = { uriHandler.openUri(state.filter.toHirifyWebUrl()) }) {
-                            Icon(Icons.Filled.OpenInBrowser, contentDescription = "Open in browser")
-                        }
-                        IconButton(onClick = { navigator.push(AboutScreen()) }) {
-                            Icon(Icons.Filled.Info, contentDescription = "About")
-                        }
-                        IconButton(onClick = { navigator.push(AiSettingsScreen()) }) {
-                            Icon(androidx.compose.material.icons.Icons.Filled.Settings, contentDescription = "Settings")
+
+                        if (!isPortrait) {
+                            IconButton(onClick = { uriHandler.openUri(state.filter.toHirifyWebUrl()) }) {
+                                Icon(Icons.Filled.OpenInBrowser, contentDescription = "Open in browser")
+                            }
+                            IconButton(onClick = { navigator.push(AboutScreen()) }) {
+                                Icon(Icons.Filled.Info, contentDescription = "About")
+                            }
+                            IconButton(onClick = { navigator.push(AiSettingsScreen()) }) {
+                                Icon(androidx.compose.material.icons.Icons.Filled.Settings, contentDescription = "Settings")
+                            }
+                        } else {
+                            Box {
+                                IconButton(onClick = { showMenu = true }) {
+                                    Text("⋮", style = MaterialTheme.typography.titleLarge, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                                }
+                                DropdownMenu(
+                                    expanded = showMenu,
+                                    onDismissRequest = { showMenu = false }
+                                ) {
+                                    DropdownMenuItem(
+                                        text = { Text("Open in browser") },
+                                        onClick = { 
+                                            showMenu = false
+                                            uriHandler.openUri(state.filter.toHirifyWebUrl()) 
+                                        },
+                                        leadingIcon = { Icon(Icons.Filled.OpenInBrowser, contentDescription = null) }
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text("About") },
+                                        onClick = { 
+                                            showMenu = false
+                                            navigator.push(AboutScreen()) 
+                                        },
+                                        leadingIcon = { Icon(Icons.Filled.Info, contentDescription = null) }
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text("Settings") },
+                                        onClick = { 
+                                            showMenu = false
+                                            navigator.push(AiSettingsScreen()) 
+                                        },
+                                        leadingIcon = { Icon(androidx.compose.material.icons.Icons.Filled.Settings, contentDescription = null) }
+                                    )
+                                }
+                            }
                         }
                     }
                 )

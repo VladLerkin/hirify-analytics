@@ -16,6 +16,10 @@ import androidx.compose.ui.draw.scale
 import hirify.analytics.core.analytics.VacancyFilter
 import hirify.analytics.core.analytics.HirifyApiClient
 import org.koin.compose.koinInject
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.HelpOutline
+import kotlinx.coroutines.launch
+import androidx.compose.foundation.interaction.MutableInteractionSource
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -42,7 +46,10 @@ fun LeftSidebar(
         Spacer(modifier = Modifier.height(8.dp))
 
         // Work Format
-        FilterSection("Формат работы") {
+        FilterSection(
+            title = "Формат работы",
+            tooltip = "Выберите формат: удаленная работа, гибридный формат (несколько дней в офисе) или полностью в офисе"
+        ) {
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 MultiSelectChip("Удаленно", "remote", filter.workFormat) { onFilterChanged(filter.copy(workFormat = it)) }
                 MultiSelectChip("Гибрид", "hybrid", filter.workFormat) { onFilterChanged(filter.copy(workFormat = it)) }
@@ -51,7 +58,10 @@ fun LeftSidebar(
         }
 
         // Remote Type
-        FilterSection("Тип удаленки") {
+        FilterSection(
+            title = "Тип удаленки",
+            tooltip = "Укажите, откуда вы можете работать: Глобал (Worldwide), из РФ, из Европы и т.д. Часто работодатели ограничивают локацию даже для удаленки"
+        ) {
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 MultiSelectChip("Глобал", "global", filter.remoteType) { onFilterChanged(filter.copy(remoteType = it)) }
                 MultiSelectChip("РФ", "russia", filter.remoteType) { onFilterChanged(filter.copy(remoteType = it)) }
@@ -63,7 +73,10 @@ fun LeftSidebar(
         val apiClient = koinInject<HirifyApiClient>()
 
         // Specializations
-        FilterSection("Специализации") {
+        FilterSection(
+            title = "Специализации",
+            tooltip = "Выберите одну или несколько профессий. Например, Frontend, Backend или QA"
+        ) {
             AutocompleteDictionaryField(
                 apiClient = apiClient,
                 dictionary = "specializations",
@@ -76,6 +89,7 @@ fun LeftSidebar(
         // Skills
         FilterSection(
             title = "Навыки",
+            tooltip = "Укажите технологии и инструменты. Переключатель И/ИЛИ позволяет искать вакансии, где требуются ВСЕ указанные навыки (И), либо ХОТЯ БЫ ОДИН из них (ИЛИ)",
             action = {
                 Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                     Text(if (filter.skillsMatchType == "AND") "И" else "ИЛИ", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -99,7 +113,10 @@ fun LeftSidebar(
         }
 
         // Grade
-        FilterSection("Грейд") {
+        FilterSection(
+            title = "Грейд",
+            tooltip = "Требуемый уровень опыта кандидата: от стажера (Trainee) до руководителя (C-level)"
+        ) {
             FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 MultiSelectChip("Стажер", "trainee", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
                 MultiSelectChip("Джуниор", "junior", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
@@ -113,7 +130,10 @@ fun LeftSidebar(
         }
 
         // Company Type
-        FilterSection("Тип компании") {
+        FilterSection(
+            title = "Тип компании",
+            tooltip = "Выберите, где вам комфортнее работать: в стартапе, корпорации, продуктовой компании или в аутсорсе"
+        ) {
             FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 MultiSelectChip("Стартап", "startup", filter.companyType) { onFilterChanged(filter.copy(companyType = it)) }
                 MultiSelectChip("Корпорация", "corporation", filter.companyType) { onFilterChanged(filter.copy(companyType = it)) }
@@ -170,15 +190,51 @@ fun CompactFilterChip(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun FilterSection(title: String, action: (@Composable () -> Unit)? = null, content: @Composable () -> Unit) {
+private fun FilterSection(
+    title: String,
+    tooltip: String? = null,
+    action: (@Composable () -> Unit)? = null,
+    content: @Composable () -> Unit
+) {
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
         ) {
-            Text(title, fontWeight = FontWeight.Medium, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                Text(title, fontWeight = FontWeight.Medium, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                if (tooltip != null) {
+                    Spacer(modifier = Modifier.width(4.dp))
+                    val tooltipState = rememberTooltipState()
+                    val scope = rememberCoroutineScope()
+                    TooltipBox(
+                        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                        tooltip = {
+                            PlainTooltip {
+                                Text(tooltip, fontSize = 12.sp)
+                            }
+                        },
+                        state = tooltipState
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.HelpOutline,
+                            contentDescription = "Info",
+                            modifier = Modifier
+                                .size(24.dp)
+                                .padding(4.dp)
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null,
+                                    onClick = { scope.launch { tooltipState.show() } }
+                                ),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                        )
+                    }
+                }
+            }
             if (action != null) {
                 action()
             }
