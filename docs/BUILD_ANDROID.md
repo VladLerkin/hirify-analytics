@@ -99,7 +99,7 @@ adb shell monkey -p com.family.tree.android -c android.intent.category.LAUNCHER 
 ```
 
 **Or manually:**
-- Find "Family Tree" app icon on your device/emulator and tap it
+- Find "Hirify Analytics" app icon on your device/emulator and tap it
 
 **Or using Android Studio:**
 - Open the project in Android Studio

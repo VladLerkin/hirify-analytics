@@ -45,7 +45,7 @@ Yandex SpeechKit is a cloud-based speech recognition and synthesis service from 
 
 ### Step 4: Configure in Application
 
-1. Open Family Tree application
+1. Open Hirify Analytics application
 2. Open menu (three dots) → **"AI Settings..."**
 3. In **"Transcription Settings"** section:
    - **Provider**: Select **"Yandex SpeechKit"**

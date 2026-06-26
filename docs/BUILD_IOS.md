@@ -1,6 +1,6 @@
 # Building and Running the iOS App
 
-This guide explains how to build and run the Family Tree iOS application on macOS using iOS Simulator.
+This guide explains how to build and run the Hirify Analytics iOS application on macOS using iOS Simulator.
 
 **Note:** This project is configured for simulator-only builds. Device builds are not supported without modifying the Xcode project configuration.
 
@@ -352,7 +352,7 @@ Before you can run iOS apps from IntelliJ IDEA, you need:
 #### Step 5: Verify the App is Running
 
 - The iOS Simulator window should open
-- Your app should launch and display the Family Tree UI
+- Your app should launch and display the Hirify Analytics UI
 - Console output appears in IntelliJ IDEA's Run panel
 - You can interact with the app in the simulator
 
@@ -550,7 +550,7 @@ The framework will be generated at:
 
 #### Step 7: Verify the App is Running
 
-- The app should launch and display your Family Tree UI
+- The app should launch and display your Hirify Analytics UI
 - Check Xcode console for any Kotlin `println()` output
 - You can interact with the app in the simulator
 
@@ -966,7 +966,7 @@ For native debugging:
 | Touch ID/Face ID | Emulated | Real biometric hardware |
 | App Store/TestFlight | Not available | Available |
 
-For the Family Tree app (primarily visualization), **iOS Simulator is sufficient** for development and testing.
+For the Hirify Analytics app (primarily visualization), **iOS Simulator is sufficient** for development and testing.
 
 ## Troubleshooting
 

@@ -1,6 +1,6 @@
 # iOS Support Troubleshooting
 
-This document addresses known issues, common compilation errors, and setup problems with iOS support in the Family Tree KMP project.
+This document addresses known issues, common compilation errors, and setup problems with iOS support in the Hirify Analytics KMP project.
 
 ## Current Status
 

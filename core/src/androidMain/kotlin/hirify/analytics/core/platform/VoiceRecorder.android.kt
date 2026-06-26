@@ -417,7 +417,7 @@ actual class VoiceRecorder actual constructor(context: Any?) {
             
             Чтобы изменить разрешения:
             1. Откройте Настройки устройства
-            2. Приложения → Family Tree
+            2. Приложения → Hirify Analytics
             3. Разрешения → Микрофон
             4. Включите разрешение "Микрофон"
             

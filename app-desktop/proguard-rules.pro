@@ -1,4 +1,4 @@
-# ProGuard rules for Family Tree Editor Desktop
+# ProGuard rules for Hirify Analytics Desktop
 
 # General JVM and Coroutines
 -keepattributes Signature, InnerClasses, EnclosingMethod, *Annotation*

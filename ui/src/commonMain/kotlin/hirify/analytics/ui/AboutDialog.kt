@@ -12,7 +12,7 @@ import hirify.analytics.core.BuildConfig
 
 const val APP_NAME = "Hirify Analytics"
 const val AUTHOR_EMAIL = "domfindus@gmail.com"
-const val GITHUB_URL = "https://github.com/VladLerkin/family-tree-editor"
+const val GITHUB_URL = "https://github.com/VladLerkin/hirify-analytics"
 
 /**
  * Expect declaration for AboutDialog.

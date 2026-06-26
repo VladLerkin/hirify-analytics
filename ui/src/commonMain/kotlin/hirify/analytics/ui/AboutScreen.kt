@@ -22,7 +22,7 @@ class AboutScreen : Screen {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("About Family Tree Editor") },
+                    title = { Text("About Hirify Analytics") },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -61,7 +61,7 @@ class AboutScreen : Screen {
                 )
                 
                 Text(
-                    text = "Source code is available on GitHub:\nhttps://github.com/VladLerkin/family-tree-editor",
+                    text = "Source code is available on GitHub:\nhttps://github.com/VladLerkin/hirify-analytics",
                     fontSize = 16.sp
                 )
                 

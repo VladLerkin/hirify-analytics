@@ -1,4 +1,4 @@
-# ProGuard/R8 rules for Family Tree Editor Android
+# ProGuard/R8 rules for Hirify Analytics Android
 
 # General Kotlin Multiplatform and Coroutines
 -keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}

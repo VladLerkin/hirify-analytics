@@ -1,6 +1,6 @@
 # AI Troubleshooting Guide
 
-This document covers common issues when using AI features (Genealogy Agents, Text Import, Voice Input) in Family Tree Editor and provides steps to resolve them.
+This document covers common issues when using AI features (Genealogy Agents, Text Import, Voice Input) in Hirify Analytics and provides steps to resolve them.
 
 ## General Diagnostics: "Test Connection"
 

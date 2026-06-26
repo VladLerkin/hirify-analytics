@@ -38,9 +38,9 @@ compose.desktop {
             packageName = "FamilyTreeEditor"
             packageVersion = libs.versions.app.version.get()
             
-            description = "Family Tree Editor Application"
-            copyright = "© 2026 Family Tree. All rights reserved."
-            vendor = "Family Tree"
+            description = "Hirify Analytics Application"
+            copyright = "© 2026 Hirify Analytics. All rights reserved."
+            vendor = "Hirify Analytics"
             
             linux {
                 modules("java.instrument", "jdk.unsupported")
@@ -50,7 +50,7 @@ compose.desktop {
             macOS {
                 bundleID = "hirify.analytics.desktop"
                 iconFile.set(project.file("src/jvmMain/resources/icon.icns"))
-                dockName = "Family Tree"
+                dockName = "Hirify Analytics"
                 infoPlist {
                     extraKeysRawXml = """
                         <key>NSMicrophoneUsageDescription</key>
@@ -60,7 +60,7 @@ compose.desktop {
             }
             
             windows {
-                menuGroup = "Family Tree"
+                menuGroup = "Hirify Analytics"
                 iconFile.set(project.file("src/jvmMain/resources/icon.ico"))
                 upgradeUuid = "12345678-1234-1234-1234-123456789012" // Fixed UUID for upgrades
             }
