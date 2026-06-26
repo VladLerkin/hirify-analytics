@@ -1,5 +1,5 @@
 import SwiftUI
-import FamilyTreeApp
+import hirifyAnalyticsApp
 
 @main
 struct iOSApp: App {

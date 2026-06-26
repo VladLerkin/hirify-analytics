@@ -46,7 +46,7 @@ class AboutScreen : Screen {
                 
                 // Typically you use a build config for the version
                 Text(
-                    text = "Version 1.0.0",
+                    text = "Version v${hirify.analytics.core.BuildConfig.APP_VERSION}",
                     fontSize = 16.sp
                 )
                 

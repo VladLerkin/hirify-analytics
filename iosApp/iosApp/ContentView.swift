@@ -1,6 +1,6 @@
 import UIKit
 import SwiftUI
-import FamilyTreeApp
+import hirifyAnalyticsApp
 
 struct ComposeView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
