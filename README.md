@@ -9,6 +9,7 @@
 ## ✨ Features
 
 - 📊 **Interactive Analytics Dashboards** - Visualize real-time job market data and HR metrics.
+- 📈 **Multiple Chart Series** - Compare up to 5 different job market queries simultaneously (Google Trends style).
 - 🔍 **Vacancy Filtering** - Deep dive into specializations, skills, formats, and regions.
 - 🎤 **Voice Input (AI)** - Use offline (Vosk) or cloud (Whisper, Google, Yandex) speech recognition to enter filters by voice.
 - 🎨 **Modern UI** - Built with Compose Multiplatform for a native look and feel on every platform.

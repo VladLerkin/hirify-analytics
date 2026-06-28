@@ -15,15 +15,25 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
-import hirify.analytics.core.analytics.CountResponse
+import hirify.analytics.ui.ChartSeries
+
+val chartColors = listOf(
+    Color(0xFF3F51B5), // Blue
+    Color(0xFFE91E63), // Pink
+    Color(0xFF4CAF50), // Green
+    Color(0xFFFF9800), // Orange
+    Color(0xFF9C27B0)  // Purple
+)
 
 @OptIn(ExperimentalTextApi::class)
 @Composable
 fun ChartRenderer(
-    chartData: CountResponse?,
+    seriesList: List<ChartSeries>,
     modifier: Modifier = Modifier
 ) {
-    if (chartData == null || chartData.getParsedBuckets().isEmpty()) {
+    val activeSeriesData = seriesList.filter { it.data != null && it.data.getParsedBuckets().isNotEmpty() }
+    
+    if (activeSeriesData.isEmpty()) {
         Box(modifier = modifier.fillMaxSize().background(Color.White), contentAlignment = androidx.compose.ui.Alignment.Center) {
             Text("Нет данных для отображения. Установите фильтры.")
         }
@@ -31,7 +41,6 @@ fun ChartRenderer(
     }
 
     val textMeasurer = rememberTextMeasurer()
-    val lineColor = MaterialTheme.colorScheme.tertiary
 
     Canvas(modifier = modifier.fillMaxSize().padding(16.dp)) {
         val width = size.width
@@ -43,10 +52,12 @@ fun ChartRenderer(
         val graphWidth = width - 2 * paddingX
         val graphHeight = height - 2 * paddingY
 
-        val sortedBuckets = chartData.getParsedBuckets().entries.sortedBy { it.key }
-        val maxCount = sortedBuckets.maxOfOrNull { it.value }?.coerceAtLeast(1) ?: 1
+        // Collect all buckets to find global min/max for axes scaling
+        val allKeys = activeSeriesData.flatMap { it.data!!.getParsedBuckets().keys }.distinct().sorted()
+        
+        val maxCount = activeSeriesData.flatMap { it.data!!.getParsedBuckets().values }.maxOrNull()?.coerceAtLeast(1) ?: 1
 
-        val stepX = if (sortedBuckets.size > 1) graphWidth / (sortedBuckets.size - 1) else graphWidth
+        val stepX = if (allKeys.size > 1) graphWidth / (allKeys.size - 1) else graphWidth
         val scaleY = graphHeight / maxCount
 
         // Draw axes
@@ -61,55 +72,6 @@ fun ChartRenderer(
             start = Offset(paddingX, height - paddingY),
             end = Offset(width - paddingX, height - paddingY),
             strokeWidth = 2f
-        )
-
-        // Draw line
-        val path = Path()
-        var lastDrawnYear = ""
-        val skip = maxOf(1, (sortedBuckets.size + 11) / 12)
-
-        sortedBuckets.forEachIndexed { index, entry ->
-            val x = paddingX + index * stepX
-            val y = height - paddingY - (entry.value * scaleY)
-            if (index == 0) {
-                path.moveTo(x, y)
-            } else {
-                path.lineTo(x, y)
-            }
-            
-            // Draw point
-            drawCircle(color = lineColor, radius = 4.dp.toPx(), center = Offset(x, y))
-            
-            // Parse year and month
-            val parts = entry.key.split("-")
-            val year = parts.getOrNull(0) ?: ""
-            val month = parts.getOrNull(1) ?: entry.key
-
-            // Draw X label (month)
-            if (index % skip == 0 || index == sortedBuckets.size - 1) {
-                val monthLayout = textMeasurer.measure(month)
-                drawText(
-                    textLayoutResult = monthLayout,
-                    topLeft = Offset(x - monthLayout.size.width / 2f, height - paddingY + 8.dp.toPx())
-                )
-                
-                // Draw year if it changed
-                if (year != lastDrawnYear && year.isNotEmpty()) {
-                    val yearLayout = textMeasurer.measure(year)
-                    drawText(
-                        textLayoutResult = yearLayout,
-                        color = Color.Gray,
-                        topLeft = Offset(x - yearLayout.size.width / 2f, height - paddingY + 28.dp.toPx())
-                    )
-                    lastDrawnYear = year
-                }
-            }
-        }
-        
-        drawPath(
-            path = path,
-            color = lineColor,
-            style = Stroke(width = 3.dp.toPx())
         )
 
         // Draw Y labels
@@ -129,6 +91,70 @@ fun ChartRenderer(
                 end = Offset(width - paddingX, y),
                 strokeWidth = 1f
             )
+        }
+
+        val skip = maxOf(1, (allKeys.size + 11) / 12)
+        var lastDrawnYear = ""
+
+        // Draw X labels
+        allKeys.forEachIndexed { index, key ->
+            val x = paddingX + index * stepX
+            val parts = key.split("-")
+            val year = parts.getOrNull(0) ?: ""
+            val month = parts.getOrNull(1) ?: key
+
+            if (index % skip == 0 || index == allKeys.size - 1) {
+                val monthLayout = textMeasurer.measure(month)
+                drawText(
+                    textLayoutResult = monthLayout,
+                    topLeft = Offset(x - monthLayout.size.width / 2f, height - paddingY + 8.dp.toPx())
+                )
+                
+                if (year != lastDrawnYear && year.isNotEmpty()) {
+                    val yearLayout = textMeasurer.measure(year)
+                    drawText(
+                        textLayoutResult = yearLayout,
+                        color = Color.Gray,
+                        topLeft = Offset(x - yearLayout.size.width / 2f, height - paddingY + 28.dp.toPx())
+                    )
+                    lastDrawnYear = year
+                }
+            }
+        }
+
+        // Draw lines for each series
+        seriesList.forEachIndexed { seriesIndex, series ->
+            val data = series.data ?: return@forEachIndexed
+            val buckets = data.getParsedBuckets()
+            if (buckets.isEmpty()) return@forEachIndexed
+            
+            val lineColor = chartColors[seriesIndex % chartColors.size]
+            val path = Path()
+            
+            var isFirst = true
+            allKeys.forEachIndexed { index, key ->
+                if (buckets.containsKey(key)) {
+                    val x = paddingX + index * stepX
+                    val y = height - paddingY - (buckets[key]!! * scaleY)
+                    
+                    if (isFirst) {
+                        path.moveTo(x, y)
+                        isFirst = false
+                    } else {
+                        path.lineTo(x, y)
+                    }
+                    
+                    drawCircle(color = lineColor, radius = 4.dp.toPx(), center = Offset(x, y))
+                }
+            }
+            
+            if (!isFirst) {
+                drawPath(
+                    path = path,
+                    color = lineColor,
+                    style = Stroke(width = 3.dp.toPx())
+                )
+            }
         }
     }
 }

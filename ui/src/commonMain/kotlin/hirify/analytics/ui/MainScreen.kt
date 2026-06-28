@@ -23,6 +23,12 @@ import androidx.compose.ui.platform.LocalUriHandler
 import hirify.analytics.ui.components.panels.LeftSidebar
 import hirify.analytics.ui.render.ChartRenderer
 import org.koin.compose.koinInject
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.ui.graphics.Color
+import hirify.analytics.core.analytics.VacancyFilter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,7 +88,7 @@ fun MainScreen() {
                         val uriHandler = LocalUriHandler.current
 
                         if (!isPortrait) {
-                            IconButton(onClick = { uriHandler.openUri(state.filter.toHirifyWebUrl()) }) {
+                            IconButton(onClick = { uriHandler.openUri((state.seriesList.getOrNull(state.activeSeriesIndex)?.filter ?: VacancyFilter()).toHirifyWebUrl()) }) {
                                 Icon(Icons.Filled.OpenInBrowser, contentDescription = "Open in browser")
                             }
                             IconButton(onClick = { navigator.push(AboutScreen()) }) {
@@ -104,7 +110,7 @@ fun MainScreen() {
                                         text = { Text("Open in browser") },
                                         onClick = { 
                                             showMenu = false
-                                            uriHandler.openUri(state.filter.toHirifyWebUrl()) 
+                                            uriHandler.openUri((state.seriesList.getOrNull(state.activeSeriesIndex)?.filter ?: VacancyFilter()).toHirifyWebUrl()) 
                                         },
                                         leadingIcon = { Icon(Icons.Filled.OpenInBrowser, contentDescription = null) }
                                     )
@@ -143,10 +149,13 @@ fun MainScreen() {
                     tonalElevation = 2.dp,
                     shadowElevation = 1.dp
                 ) {
-                    LeftSidebar(
-                        filter = state.filter,
-                        onFilterChanged = { viewModel.updateFilter(it) }
-                    )
+                    val activeSeries = state.seriesList.getOrNull(state.activeSeriesIndex)
+                    if (activeSeries != null) {
+                        LeftSidebar(
+                            filter = activeSeries.filter,
+                            onFilterChanged = { viewModel.updateFilter(it) }
+                        )
+                    }
                 }
             }
 
@@ -157,20 +166,102 @@ fun MainScreen() {
                 tonalElevation = 2.dp,
                 shadowElevation = 1.dp
             ) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    if (state.isLoading) {
-                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                    } else if (state.error != null) {
-                        Text(text = state.error!!, color = MaterialTheme.colorScheme.error, modifier = Modifier.align(Alignment.Center))
-                    } else {
-                        ChartRenderer(
-                            chartData = state.analyticsData,
-                            modifier = Modifier.fillMaxSize()
-                        )
+                Column(modifier = Modifier.fillMaxSize()) {
+                    // Series Tabs
+                    ScrollableTabRow(
+                        selectedTabIndex = state.activeSeriesIndex,
+                        edgePadding = 8.dp,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        divider = {},
+                        indicator = {}
+                    ) {
+                        state.seriesList.forEachIndexed { index, series ->
+                            val color = hirify.analytics.ui.render.chartColors[index % hirify.analytics.ui.render.chartColors.size]
+                            val isSelected = state.activeSeriesIndex == index
+                            
+                            Surface(
+                                shape = MaterialTheme.shapes.small,
+                                color = if (isSelected) color.copy(alpha = 0.1f) else Color.Transparent,
+                                border = androidx.compose.foundation.BorderStroke(1.dp, if (isSelected) color else MaterialTheme.colorScheme.outlineVariant),
+                                modifier = Modifier.padding(4.dp).height(32.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(horizontal = 12.dp).clickable {
+                                        if (isSelected && isPortrait) {
+                                            isSidebarVisible = true
+                                        } else {
+                                            viewModel.selectSeries(index)
+                                        }
+                                    }
+                                ) {
+                                    Box(modifier = Modifier.size(8.dp).background(color, androidx.compose.foundation.shape.CircleShape))
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = series.filter.toShortLabel(),
+                                        color = if (isSelected) color else MaterialTheme.colorScheme.onSurface,
+                                        style = MaterialTheme.typography.labelLarge
+                                    )
+                                    if (series.isLoading) {
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        CircularProgressIndicator(modifier = Modifier.size(12.dp), color = color, strokeWidth = 2.dp)
+                                    }
+                                    if (state.seriesList.size > 1) {
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        IconButton(onClick = { viewModel.removeSeries(index) }, modifier = Modifier.size(16.dp)) {
+                                            Icon(Icons.Default.Close, contentDescription = "Remove", tint = if (isSelected) color else MaterialTheme.colorScheme.onSurfaceVariant)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        if (state.seriesList.size < 5) {
+                            IconButton(onClick = { viewModel.addSeries() }, modifier = Modifier.padding(4.dp)) {
+                                Icon(Icons.Default.Add, contentDescription = "Add Series")
+                            }
+                        }
+                    }
+                    
+                    Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                        val activeSeries = state.seriesList.getOrNull(state.activeSeriesIndex)
+                        if (activeSeries?.error != null) {
+                            Text(text = activeSeries.error!!, color = MaterialTheme.colorScheme.error, modifier = Modifier.align(Alignment.Center))
+                        } else {
+                            ChartRenderer(
+                                seriesList = state.seriesList,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
                     }
                 }
             }
         }
         }
     }
+}
+
+fun VacancyFilter.toShortLabel(): String {
+    val parts = mutableListOf<String>()
+    if (!skills.isNullOrEmpty()) parts.add(skills!!.split(",").first().trim())
+    if (!specializations.isNullOrEmpty()) parts.add(specializations!!.split(",").first().trim())
+    if (!grade.isNullOrEmpty()) {
+        val gradeValue = grade!!.split(",").first().trim()
+        val mappedGrade = when (gradeValue) {
+            "trainee" -> "Стажер"
+            "junior" -> "Джуниор"
+            "middle" -> "Мидл"
+            "senior" -> "Сеньор"
+            "lead" -> "Лид"
+            "head" -> "Head"
+            "director" -> "Директор"
+            "c_level" -> "C-level"
+            else -> gradeValue
+        }
+        parts.add(mappedGrade)
+    }
+    
+    if (parts.isEmpty()) return "Все вакансии"
+    val fullLabel = parts.joinToString(", ")
+    return if (fullLabel.length > 20) fullLabel.take(17) + "..." else fullLabel
 }
