@@ -110,8 +110,9 @@ class AiSettingsScreen : Screen {
                 Column(
                     modifier = Modifier
                         .widthIn(max = 600.dp)
-                        .padding(16.dp)
+                        .fillMaxHeight()
                         .verticalScroll(rememberScrollState())
+                        .padding(16.dp)
                 ) {
                     Text(
                         text = strings.hirifyKeyWarning,

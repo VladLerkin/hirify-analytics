@@ -15,7 +15,7 @@ class HirifyApiClient(
     private val baseUrl = "https://api.hirify.me/api/partner/analytics/vacancies/count"
 
     suspend fun getAnalyticsCount(filter: VacancyFilter): Result<CountResponse> {
-        val apiKey = aiSettingsStorage.loadConfig().hirifyApiKey
+        val apiKey = aiSettingsStorage.loadConfig().hirifyApiKey.trim()
         if (apiKey.isBlank()) {
             return Result.failure(Exception("Hirify API key is not configured in AI Settings"))
         }
@@ -60,7 +60,7 @@ class HirifyApiClient(
     }
 
     suspend fun searchDictionary(dictionary: String, query: String): Result<List<DictionaryItem>> {
-        val apiKey = aiSettingsStorage.loadConfig().hirifyApiKey
+        val apiKey = aiSettingsStorage.loadConfig().hirifyApiKey.trim()
         if (apiKey.isBlank()) {
             return Result.failure(Exception("Hirify API key is not configured in AI Settings"))
         }

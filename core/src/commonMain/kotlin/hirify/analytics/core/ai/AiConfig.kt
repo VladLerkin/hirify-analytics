@@ -86,10 +86,10 @@ data class AiConfig(
     @Suppress("DEPRECATION")
     fun getApiKeyForProvider(): String {
         return when (getProvider()) {
-            AiProvider.OPENAI -> openaiApiKey.ifBlank { apiKey }
-            AiProvider.GOOGLE -> googleAiApiKey.ifBlank { googleApiKey.ifBlank { apiKey } }
-            AiProvider.YANDEX -> yandexApiKey.ifBlank { apiKey }
-            AiProvider.OLLAMA, AiProvider.CUSTOM, AiProvider.LOCAL_LLAMATIK -> apiKey  // For Ollama, Custom and Local use old field
+            AiProvider.OPENAI -> openaiApiKey.ifBlank { apiKey }.trim()
+            AiProvider.GOOGLE -> googleAiApiKey.ifBlank { googleApiKey.ifBlank { apiKey } }.trim()
+            AiProvider.YANDEX -> yandexApiKey.ifBlank { apiKey }.trim()
+            AiProvider.OLLAMA, AiProvider.CUSTOM, AiProvider.LOCAL_LLAMATIK -> apiKey.trim()
         }
     }
     
@@ -99,9 +99,9 @@ data class AiConfig(
     @Suppress("DEPRECATION")
     fun getApiKeyForTranscription(): String {
         return when (getTranscriptionProvider()) {
-            TranscriptionProvider.OPENAI_WHISPER -> openaiApiKey.ifBlank { apiKey }
-            TranscriptionProvider.GOOGLE_SPEECH -> googleAiApiKey.ifBlank { googleApiKey }
-            TranscriptionProvider.YANDEX_SPEECHKIT -> yandexApiKey.ifBlank { apiKey }
+            TranscriptionProvider.OPENAI_WHISPER -> openaiApiKey.ifBlank { apiKey }.trim()
+            TranscriptionProvider.GOOGLE_SPEECH -> googleAiApiKey.ifBlank { googleApiKey }.trim()
+            TranscriptionProvider.YANDEX_SPEECHKIT -> yandexApiKey.ifBlank { apiKey }.trim()
             TranscriptionProvider.VOSK_LOCAL -> ""
         }
     }

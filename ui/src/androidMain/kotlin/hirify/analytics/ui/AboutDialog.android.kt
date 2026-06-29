@@ -31,7 +31,7 @@ actual fun AboutDialog(onDismiss: () -> Unit) {
         },
         title = {
             Text(
-                text = APP_NAME,
+                text = "Hirify Analytics",
                 style = MaterialTheme.typography.titleLarge
             )
         },

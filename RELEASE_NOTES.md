@@ -1,5 +1,8 @@
 # Hirify Analytics Release Notes
 
+## v1.0.10 (June 2026)
+* **Bug Fixes:** Resolved an issue where pasting an API key with whitespace or a trailing newline caused an HTTP connection error. Keys are now automatically trimmed.
+
 ## v1.0.8 (June 2026)
 * **Multi-Language Support:** Introduced a new robust i18n system for multi-language translations across the UI.
 * **Smart AI Agents:** Enhanced AI functionality by validating skills against an API dictionary for greater accuracy.

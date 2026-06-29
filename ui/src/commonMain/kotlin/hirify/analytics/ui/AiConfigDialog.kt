@@ -86,7 +86,7 @@ fun AiConfigDialog(
             ) {
                 Column(
                     modifier = Modifier
-                        .weight(1f, fill = false)
+                        .weight(1f)
                         .verticalScroll(rememberScrollState())
                 ) {
                         // Preset selector
