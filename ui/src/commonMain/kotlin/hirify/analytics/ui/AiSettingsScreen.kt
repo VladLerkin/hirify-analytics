@@ -27,6 +27,8 @@ import hirify.analytics.core.ai.AiResult
 import org.koin.compose.koinInject
 import kotlinx.coroutines.launch
 import hirify.analytics.core.ai.agent.AgentService
+import hirify.analytics.ui.i18n.LocalAppStrings
+import hirify.analytics.ui.i18n.LocalLanguageUpdater
 
 class AiSettingsScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -60,15 +62,19 @@ class AiSettingsScreen : Screen {
         var yandexKey by remember { mutableStateOf(initialConfig.yandexApiKey) }
         var yandexFolderId by remember { mutableStateOf(initialConfig.yandexFolderId) }
         var hirifyKey by remember { mutableStateOf(initialConfig.hirifyApiKey) }
+        var interfaceLanguage by remember { mutableStateOf(initialConfig.interfaceLanguage) }
         val scope = rememberCoroutineScope()
+        
+        val strings = LocalAppStrings.current
+        val updateLanguage = LocalLanguageUpdater.current
         
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("AI Settings") },
+                    title = { Text(strings.aiSettingsTitle) },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = strings.back)
                         }
                     },
                     actions = {
@@ -88,12 +94,13 @@ class AiSettingsScreen : Screen {
                                 googleAiApiKey = googleKey,
                                 yandexApiKey = yandexKey,
                                 yandexFolderId = yandexFolderId,
-                                hirifyApiKey = hirifyKey
+                                hirifyApiKey = hirifyKey,
+                                interfaceLanguage = interfaceLanguage
                             )
                             storage.saveConfig(config)
                             navigator.pop()
                         }) {
-                            Icon(Icons.Default.Check, contentDescription = "Save")
+                            Icon(Icons.Default.Check, contentDescription = strings.save)
                         }
                     }
                 )
@@ -107,7 +114,7 @@ class AiSettingsScreen : Screen {
                         .verticalScroll(rememberScrollState())
                 ) {
                     Text(
-                        text = "Для работы приложения необходим ключ аналитики Hirify. Если у вас его нет, обратитесь в службу поддержки Hirify.",
+                        text = strings.hirifyKeyWarning,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(bottom = 16.dp)
@@ -116,23 +123,23 @@ class AiSettingsScreen : Screen {
                     ApiKeyTextField(
                         value = hirifyKey,
                         onValueChange = { hirifyKey = it },
-                        label = "Hirify Analytics API Key",
+                        label = strings.hirifyKeyLabel,
                         placeholder = "hrf_...",
-                        supportingText = "API key for Hirify Vacancy Analytics.",
+                        supportingText = strings.hirifyKeySupportingText,
                         modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
                     )
                     
                     HorizontalDivider(modifier = Modifier.padding(bottom = 16.dp))
                     
                     Text(
-                        text = "Выберите AI-модель для распознавания голоса и автоматической настройки фильтров. Это позволяет получать аналитику по вакансиям, просто произнося свои пожелания вслух.",
+                        text = strings.modelSelectionWarning,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
                     
                     Text(
-                        text = "Presets:",
+                        text = strings.presetsLabel,
                         style = MaterialTheme.typography.labelLarge,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
@@ -144,7 +151,7 @@ class AiSettingsScreen : Screen {
                             onClick = { presetsExpanded = true },
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text(presets.getOrNull(selectedPresetIndex)?.first ?: "Select Preset")
+                            Text(presets.getOrNull(selectedPresetIndex)?.first ?: strings.selectPreset)
                         }
                         DropdownMenu(
                             expanded = presetsExpanded,
@@ -175,9 +182,9 @@ class AiSettingsScreen : Screen {
                             ApiKeyTextField(
                                 value = openAiKey,
                                 onValueChange = { openAiKey = it },
-                                label = "OpenAI API Key",
+                                label = strings.openaiApiKeyLabel,
                                 placeholder = "sk-...",
-                                supportingText = "Provided key is stored in memory and masked in logs.",
+                                supportingText = strings.keyStoredInMemory,
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }
@@ -185,9 +192,9 @@ class AiSettingsScreen : Screen {
                             ApiKeyTextField(
                                 value = googleKey,
                                 onValueChange = { googleKey = it },
-                                label = "Google AI API Key",
+                                label = strings.googleApiKeyLabel,
                                 placeholder = "AIza...",
-                                supportingText = "Provided key is stored in memory and masked in logs.",
+                                supportingText = strings.keyStoredInMemory,
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }
@@ -195,17 +202,17 @@ class AiSettingsScreen : Screen {
                             ApiKeyTextField(
                                 value = yandexKey,
                                 onValueChange = { yandexKey = it },
-                                label = "YandexGPT API Key",
+                                label = strings.yandexApiKeyLabel,
                                 placeholder = "AQVN...",
-                                supportingText = "Provided key is stored in memory and masked in logs.",
+                                supportingText = strings.keyStoredInMemory,
                                 modifier = Modifier.fillMaxWidth()
                             )
                             OutlinedTextField(
                                 value = yandexFolderId,
                                 onValueChange = { yandexFolderId = it },
-                                label = { Text("Folder ID (optional)") },
+                                label = { Text(strings.yandexFolderIdLabel) },
                                 placeholder = { Text("default or b1g...") },
-                                supportingText = { Text("Yandex Cloud Folder ID. Leave as 'default' for automatic detection.") },
+                                supportingText = { Text(strings.yandexFolderIdSupportingText) },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(bottom = 12.dp),
@@ -216,7 +223,7 @@ class AiSettingsScreen : Screen {
                             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 12.dp)) {
                                 val ollamaCommand = "ollama run ${if (model.isNotBlank()) model else "qwen2.5:7b"}"
                                 Text(
-                                    text = "API key is not required for local models\nTo download the selected model run: $ollamaCommand",
+                                    text = strings.apiKeyNotRequired + ollamaCommand,
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.weight(1f)
@@ -235,7 +242,7 @@ class AiSettingsScreen : Screen {
                         OutlinedTextField(
                             value = baseUrl,
                             onValueChange = { baseUrl = it },
-                            label = { Text("Base URL") },
+                            label = { Text(strings.baseUrlLabel) },
                             placeholder = { 
                                 Text(
                                     when (provider) {
@@ -254,7 +261,7 @@ class AiSettingsScreen : Screen {
                     OutlinedTextField(
                         value = model,
                         onValueChange = { model = it },
-                        label = { Text("Model") },
+                        label = { Text(strings.modelLabel) },
                         placeholder = { Text("gpt-4o-mini") },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -265,9 +272,9 @@ class AiSettingsScreen : Screen {
                     OutlinedTextField(
                         value = language,
                         onValueChange = { language = it },
-                        label = { Text("Transcription Language (ISO-639-1)") },
+                        label = { Text(strings.transcriptionLanguageLabel) },
                         placeholder = { Text("ka, ru, en, etc.") },
-                        supportingText = { Text("Language code for transcription. Leave empty for auto-detection.") },
+                        supportingText = { Text(strings.transcriptionLanguageSupportingText) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 12.dp),
@@ -275,17 +282,17 @@ class AiSettingsScreen : Screen {
                     )
                     
                     Text(
-                        text = "Speech Recognition Provider:",
+                        text = strings.speechRecognitionProviderLabel,
                         style = MaterialTheme.typography.labelLarge,
                         modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
                     )
                     
                     var transcriptionExpanded by remember { mutableStateOf(false) }
                     val transcriptionProviders = listOf(
-                        "VOSK_LOCAL" to "Vosk Local (Offline & Free)",
-                        "OPENAI_WHISPER" to "OpenAI Whisper",
-                        "GOOGLE_SPEECH" to "Google Speech-to-Text",
-                        "YANDEX_SPEECHKIT" to "Yandex SpeechKit"
+                        "OPENAI_WHISPER" to strings.openaiWhisperProvider,
+                        "VOSK_LOCAL" to strings.voskLocalProvider,
+                        "GOOGLE_SPEECH" to strings.googleSpeechProvider,
+                        "YANDEX_SPEECHKIT" to strings.yandexSpeechKitProvider
                     )
                     
                     Box(modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
@@ -293,7 +300,7 @@ class AiSettingsScreen : Screen {
                             onClick = { transcriptionExpanded = true },
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text(transcriptionProviders.find { it.first == transcriptionProvider }?.second ?: "Select Provider")
+                            Text(transcriptionProviders.find { it.first == transcriptionProvider }?.second ?: strings.selectProvider)
                         }
                         DropdownMenu(
                             expanded = transcriptionExpanded,
@@ -323,14 +330,14 @@ class AiSettingsScreen : Screen {
                         
                         if (isDownloaded) {
                             Text(
-                                text = "✓ Model for '$currentLang' is downloaded and ready.",
+                                text = "✓ ${strings.modelDownloaded}",
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(vertical = 8.dp)
                             )
                         } else {
                             Column(modifier = Modifier.padding(vertical = 8.dp)) {
                                 Text(
-                                    text = "Vosk requires a ~45MB language model to be downloaded for offline use.",
+                                    text = strings.voskRequiresModel,
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.padding(bottom = 8.dp)
@@ -359,13 +366,13 @@ class AiSettingsScreen : Screen {
                                             }
                                         }
                                     }) {
-                                        Text("Download Model")
+                                        Text(strings.downloadModel)
                                     }
                                 }
                                 
                                 if (downloadError != null) {
                                     Text(
-                                        text = "Error: $downloadError",
+                                        text = "${strings.error}: $downloadError",
                                         color = MaterialTheme.colorScheme.error,
                                         style = MaterialTheme.typography.bodySmall,
                                         modifier = Modifier.padding(top = 4.dp)
@@ -379,9 +386,9 @@ class AiSettingsScreen : Screen {
                         ApiKeyTextField(
                             value = openAiKey,
                             onValueChange = { openAiKey = it },
-                            label = "OpenAI API Key (Whisper)",
+                            label = strings.openaiWhisperApiKeyLabel,
                             placeholder = "sk-...",
-                            supportingText = "API key for OpenAI Whisper transcription.",
+                            supportingText = strings.openaiWhisperApiKeySupportingText,
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -389,9 +396,9 @@ class AiSettingsScreen : Screen {
                         ApiKeyTextField(
                             value = googleKey,
                             onValueChange = { googleKey = it },
-                            label = "Google AI API Key (Speech-to-Text)",
+                            label = strings.googleSpeechApiKeyLabel,
                             placeholder = "AIza...",
-                            supportingText = "API key for Google Speech-to-Text.",
+                            supportingText = strings.googleSpeechApiKeySupportingText,
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -399,19 +406,33 @@ class AiSettingsScreen : Screen {
                         ApiKeyTextField(
                             value = yandexKey,
                             onValueChange = { yandexKey = it },
-                            label = "Yandex Cloud API Key (SpeechKit)",
+                            label = strings.yandexSpeechKitApiKeyLabel,
                             placeholder = "AQVN...",
-                            supportingText = "API key for Yandex SpeechKit.",
+                            supportingText = strings.yandexSpeechKitApiKeySupportingText,
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
 
 
                     Text(
-                        text = "Advanced Settings:",
+                        text = strings.advancedSettings,
                         style = MaterialTheme.typography.labelLarge,
                         modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
                     )
+                    
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
+                        Text(strings.interfaceLanguage, modifier = Modifier.weight(1f))
+                        var langExpanded by remember { mutableStateOf(false) }
+                        Box {
+                            OutlinedButton(onClick = { langExpanded = true }) {
+                                Text(if (interfaceLanguage == "ru") "Русский" else "English")
+                            }
+                            DropdownMenu(expanded = langExpanded, onDismissRequest = { langExpanded = false }) {
+                                DropdownMenuItem(text = { Text("Русский") }, onClick = { interfaceLanguage = "ru"; updateLanguage("ru"); langExpanded = false })
+                                DropdownMenuItem(text = { Text("English") }, onClick = { interfaceLanguage = "en"; updateLanguage("en"); langExpanded = false })
+                            }
+                        }
+                    }
                     
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(bottom = 48.dp),
@@ -420,7 +441,7 @@ class AiSettingsScreen : Screen {
                         OutlinedTextField(
                             value = temperature,
                             onValueChange = { temperature = it },
-                            label = { Text("Temperature") },
+                            label = { Text(strings.temperatureLabel) },
                             placeholder = { Text("0.7") },
                             modifier = Modifier.weight(1f),
                             singleLine = true
@@ -429,7 +450,7 @@ class AiSettingsScreen : Screen {
                         OutlinedTextField(
                             value = maxTokens,
                             onValueChange = { maxTokens = it },
-                            label = { Text("Max Tokens") },
+                            label = { Text(strings.maxTokensLabel) },
                             placeholder = { Text("4000") },
                             modifier = Modifier.weight(1f),
                             singleLine = true
@@ -446,7 +467,7 @@ class AiSettingsScreen : Screen {
                         onClick = {
                             if (isTestingConnection) return@Button
                             isTestingConnection = true
-                            testConnectionResult = "Testing connection..."
+                            testConnectionResult = strings.testingConnection
                             
                             scope.launch {
                                 try {
@@ -465,7 +486,8 @@ class AiSettingsScreen : Screen {
                                         googleAiApiKey = googleKey,
                                         yandexApiKey = yandexKey,
                                         yandexFolderId = yandexFolderId,
-                                        hirifyApiKey = hirifyKey
+                                        hirifyApiKey = hirifyKey,
+                                        interfaceLanguage = interfaceLanguage
                                     )
                                     val client = aiClientFactory.createClient(currentConfig)
                                     val result = client.sendPromptSafe("Hello, are you there?", currentConfig)
@@ -473,16 +495,16 @@ class AiSettingsScreen : Screen {
                                     when (result) {
                                         is AiResult.Success -> {
                                             testConnectionSuccess = true
-                                            testConnectionResult = "Connection successful!\nResponse: ${result.text.take(100)}"
+                                            testConnectionResult = "${strings.connectionSuccessful}\nResponse: ${result.text.take(100)}"
                                         }
                                         is AiResult.Error -> {
                                             testConnectionSuccess = false
-                                            testConnectionResult = "Connection failed:\n${result.message}"
+                                            testConnectionResult = "${strings.connectionFailed}:\n${result.message}"
                                         }
                                     }
                                 } catch (e: Exception) {
                                     testConnectionSuccess = false
-                                    testConnectionResult = "Error: ${e.message}"
+                                    testConnectionResult = "${strings.error}: ${e.message}"
                                 } finally {
                                     isTestingConnection = false
                                 }
@@ -497,7 +519,7 @@ class AiSettingsScreen : Screen {
                         if (isTestingConnection) {
                             CircularProgressIndicator(modifier = Modifier.size(24.dp).padding(end = 8.dp), color = MaterialTheme.colorScheme.onSecondaryContainer, strokeWidth = 2.dp)
                         }
-                        Text("Test AI Connection")
+                        Text(strings.testAiConnection)
                     }
                     
                     if (testConnectionResult != null) {

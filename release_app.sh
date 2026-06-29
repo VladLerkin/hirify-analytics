@@ -57,9 +57,18 @@ COMMIT_MSG="Release v$NEW_VERSION"
 git commit -m "$COMMIT_MSG"
 
 TAG_NAME="v$NEW_VERSION"
-git tag "$TAG_NAME"
 
-echo "Commited and tagged: $TAG_NAME"
+# Extract release notes for the new version from RELEASE_NOTES.md
+# It looks for the section starting with "## vNEW_VERSION" and stops at the next "## v"
+RELEASE_NOTES=$(awk "/^## v$NEW_VERSION/ {flag=1; next} /^## v/ {flag=0} flag" RELEASE_NOTES.md | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+
+if [ -n "$RELEASE_NOTES" ]; then
+    git tag -a "$TAG_NAME" -m "Release $TAG_NAME" -m "$RELEASE_NOTES"
+    echo "Commited and tagged: $TAG_NAME with release notes."
+else
+    git tag "$TAG_NAME"
+    echo "Commited and tagged: $TAG_NAME (no release notes found in RELEASE_NOTES.md)."
+fi
 
 # 5. Push
 echo "Pushing to origin..."

@@ -22,7 +22,7 @@ class AgentService(
             Allowed workFormat: remote, hybrid, onsite. (Can be comma-separated)
             Allowed remoteType: global, russia, europe, usa. (Can be comma-separated)
             Allowed companyType: startup, corporation, product_company. (Can be comma-separated)
-            Allowed skills: any comma-separated string (e.g. "java, kotlin").
+            Allowed skills: any comma-separated string (e.g. "java, kotlin"). The user will often dictate English IT skills using Russian words, transliterations, or with misspellings (e.g., "спринг", "котлин", "нода", "сикуэл", "реак"). You MUST analyze the phonetic spelling of such words and ALWAYS translate and correct them to the standard English IT terms (e.g., "Spring", "Kotlin", "Node.js", "SQL", "React"). If there's a typo in English (e.g., "jvascript"), correct it to the proper term (e.g., "JavaScript"). Validate against a professional IT skills dictionary.
             Allowed skillsMatchType: "AND" or "OR".
             
             Example dictation: "Покажи вакансии сеньор бэкендеров на удаленке в Европе со знанием java и kotlin"

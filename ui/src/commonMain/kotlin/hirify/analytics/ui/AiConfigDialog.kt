@@ -41,6 +41,7 @@ fun AiConfigDialog(
     onConfirm: (AiConfig) -> Unit
 ) {
     val aiClientFactory = org.koin.compose.koinInject<AiClientFactory>()
+    val strings = hirify.analytics.ui.i18n.LocalAppStrings.current
     val presets = AiPresets.getAllPresets()
     
     // Find the preset index that matches initialConfig.model
@@ -92,7 +93,7 @@ fun AiConfigDialog(
                         var presetsExpanded by remember { mutableStateOf(false) }
                         
                         Text(
-                            text = "Presets:",
+                            text = strings.presetsLabel,
                             style = MaterialTheme.typography.labelLarge,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
@@ -102,7 +103,7 @@ fun AiConfigDialog(
                                 onClick = { presetsExpanded = true },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Text(presets.getOrNull(selectedPresetIndex)?.first ?: "Select Preset")
+                                Text(presets.getOrNull(selectedPresetIndex)?.first ?: strings.selectPreset)
                             }
                             DropdownMenu(
                                 expanded = presetsExpanded,
@@ -134,9 +135,9 @@ fun AiConfigDialog(
                                 ApiKeyTextField(
                                     value = openAiKey,
                                     onValueChange = { openAiKey = it },
-                                    label = "OpenAI API Key",
+                                    label = strings.openaiApiKeyLabel,
                                     placeholder = "sk-...",
-                                    supportingText = "Provided key is stored in memory and masked in logs.",
+                                    supportingText = strings.keyStoredInMemory,
                                     modifier = Modifier.fillMaxWidth()
                                 )
                             }
@@ -145,9 +146,9 @@ fun AiConfigDialog(
                                 ApiKeyTextField(
                                     value = googleKey,
                                     onValueChange = { googleKey = it },
-                                    label = "Google AI API Key",
+                                    label = strings.googleApiKeyLabel,
                                     placeholder = "AIza...",
-                                    supportingText = "Provided key is stored in memory and masked in logs.",
+                                    supportingText = strings.keyStoredInMemory,
                                     modifier = Modifier.fillMaxWidth()
                                 )
                             }
@@ -155,17 +156,17 @@ fun AiConfigDialog(
                                 ApiKeyTextField(
                                     value = yandexKey,
                                     onValueChange = { yandexKey = it },
-                                    label = "YandexGPT API Key",
+                                    label = strings.yandexApiKeyLabel,
                                     placeholder = "AQVN...",
-                                    supportingText = "Provided key is stored in memory and masked in logs.",
+                                    supportingText = strings.keyStoredInMemory,
                                     modifier = Modifier.fillMaxWidth()
                                 )
                                 OutlinedTextField(
                                     value = yandexFolderId,
                                     onValueChange = { yandexFolderId = it },
-                                    label = { Text("Folder ID (optional)") },
+                                    label = { Text(strings.yandexFolderIdLabel) },
                                     placeholder = { Text("default or b1g...") },
-                                    supportingText = { Text("Yandex Cloud Folder ID. Leave as 'default' for automatic detection when using a service account API key.") },
+                                    supportingText = { Text(strings.yandexFolderIdSupportingText) },
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(bottom = 12.dp),
@@ -245,7 +246,7 @@ fun AiConfigDialog(
                                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 12.dp)) {
                                     val ollamaCommand = "ollama run ${if (model.isNotBlank()) model else "qwen2.5:7b"}"
                                     Text(
-                                        text = "API key is not required for local models\nTo download the selected model run: $ollamaCommand",
+                                        text = strings.apiKeyNotRequired + ollamaCommand,
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.weight(1f)
@@ -265,7 +266,7 @@ fun AiConfigDialog(
                             OutlinedTextField(
                                 value = baseUrl,
                                 onValueChange = { baseUrl = it },
-                                label = { Text("Base URL") },
+                                label = { Text(strings.baseUrlLabel) },
                                 placeholder = { 
                                     Text(
                                         when (provider) {
@@ -291,7 +292,7 @@ fun AiConfigDialog(
                         }
                         
                         Text(
-                            text = "Model:",
+                            text = "${strings.modelLabel}:",
                             style = MaterialTheme.typography.labelLarge,
                             modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
                         )
@@ -324,7 +325,7 @@ fun AiConfigDialog(
                             OutlinedTextField(
                                 value = model,
                                 onValueChange = { model = it },
-                                label = { Text("Model") },
+                                label = { Text(strings.modelLabel) },
                                 placeholder = { Text("Model name") },
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -337,9 +338,9 @@ fun AiConfigDialog(
                         OutlinedTextField(
                             value = language,
                             onValueChange = { language = it },
-                            label = { Text("Transcription Language (ISO-639-1)") },
+                            label = { Text(strings.transcriptionLanguageLabel) },
                             placeholder = { Text("ka, ru, en, etc.") },
-                            supportingText = { Text("Language code for transcription (e.g., 'ka' for Georgian, 'ru' for Russian). Leave empty for auto-detection.") },
+                            supportingText = { Text(strings.transcriptionLanguageSupportingText) },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(bottom = 12.dp),
@@ -348,15 +349,15 @@ fun AiConfigDialog(
                         
                         var transcriptionExpanded by remember { mutableStateOf(false) }
                         val transcriptionProviders = listOf(
-                            "VOSK_LOCAL" to "Vosk Local (Offline & Free)",
-                            "OPENAI_WHISPER" to "OpenAI Whisper",
-                            "GOOGLE_SPEECH" to "Google Speech-to-Text (best for Georgian)",
-                            "YANDEX_SPEECHKIT" to "Yandex SpeechKit (best for Russian and CIS languages)"
+                            "OPENAI_WHISPER" to strings.openaiWhisperProvider,
+                            "VOSK_LOCAL" to strings.voskLocalProvider,
+                            "GOOGLE_SPEECH" to strings.googleSpeechProvider,
+                            "YANDEX_SPEECHKIT" to strings.yandexSpeechKitProvider
                         )
                         
                         // Transcription provider selection
                         Text(
-                            text = "Speech Recognition Provider:",
+                            text = strings.speechRecognitionProviderLabel,
                             style = MaterialTheme.typography.labelLarge,
                             modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
                         )
@@ -366,7 +367,7 @@ fun AiConfigDialog(
                                 onClick = { transcriptionExpanded = true },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Text(transcriptionProviders.find { it.first == transcriptionProvider }?.second ?: "Select Provider")
+                                Text(transcriptionProviders.find { it.first == transcriptionProvider }?.second ?: strings.selectProvider)
                             }
                             DropdownMenu(
                                 expanded = transcriptionExpanded,
@@ -432,14 +433,14 @@ fun AiConfigDialog(
                             
                             if (isDownloaded) {
                                 Text(
-                                    text = "✓ Model for '$currentLang' is downloaded and ready.",
+                                    text = "✓ ${strings.modelDownloaded}",
                                     color = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.padding(vertical = 8.dp)
                                 )
                             } else {
                                 Column(modifier = Modifier.padding(vertical = 8.dp)) {
                                     Text(
-                                        text = "Vosk requires a ~45MB language model to be downloaded for offline use.",
+                                        text = strings.voskRequiresModel,
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.padding(bottom = 8.dp)
@@ -486,7 +487,7 @@ fun AiConfigDialog(
                         
                         // Advanced settings
                         Text(
-                            text = "Advanced Settings:",
+                            text = strings.advancedSettings,
                             style = MaterialTheme.typography.labelLarge,
                             modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
                         )
@@ -498,7 +499,7 @@ fun AiConfigDialog(
                             OutlinedTextField(
                                 value = temperature,
                                 onValueChange = { temperature = it },
-                                label = { Text("Temperature") },
+                                label = { Text(strings.temperatureLabel) },
                                 placeholder = { Text("0.7") },
                                 modifier = Modifier.weight(1f),
                                 singleLine = true
@@ -507,7 +508,7 @@ fun AiConfigDialog(
                             OutlinedTextField(
                                 value = maxTokens,
                                 onValueChange = { maxTokens = it },
-                                label = { Text("Max Tokens") },
+                                label = { Text(strings.maxTokensLabel) },
                                 placeholder = { Text("4000") },
                                 modifier = Modifier.weight(1f),
                                 singleLine = true
@@ -642,7 +643,7 @@ fun AiConfigDialog(
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text("Cancel")
+                        Text(strings.cancel)
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(
@@ -673,7 +674,7 @@ fun AiConfigDialog(
                         },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Confirm")
+                        Text(strings.confirm)
                     }
                 }
             }

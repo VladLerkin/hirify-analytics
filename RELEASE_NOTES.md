@@ -1,6 +1,11 @@
 # Hirify Analytics Release Notes
 
-## v1.1.0 (Upcoming)
+## v1.0.8 (June 2026)
+* **Multi-Language Support:** Introduced a new robust i18n system for multi-language translations across the UI.
+* **Smart AI Agents:** Enhanced AI functionality by validating skills against an API dictionary for greater accuracy.
+* **Automated Releases:** Upgraded the release workflow to automatically sync and include release notes in Git tags.
+
+## v1.0.7 (June 2026)
 * **Multiple Chart Series (Google Trends Style):** Compare up to 5 different job market queries on the same chart simultaneously.
 * **Dynamic Tab Labels:** Added auto-generated semantic names for each query tab (e.g., "Java, Сеньор") based on active filters.
 * **Enhanced Mobile UX:** In portrait mode, tapping an active tab now quickly toggles the sidebar for filter adjustments.

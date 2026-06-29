@@ -62,7 +62,10 @@ data class AiConfig(
     val pamyatNarodaCookies: String = "",
     
     // Cookie string for FamilySearch session injection
-    val familySearchCookies: String = ""
+    val familySearchCookies: String = "",
+    
+    // Interface Language (e.g. "ru", "en")
+    val interfaceLanguage: String = "ru"
 ) {
     fun getProvider(): AiProvider = try {
         AiProvider.valueOf(provider)

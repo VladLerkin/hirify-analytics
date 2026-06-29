@@ -9,8 +9,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import hirify.analytics.core.BuildConfig
+import hirify.analytics.ui.i18n.LocalAppStrings
 
-const val APP_NAME = "Hirify Analytics"
 const val AUTHOR_EMAIL = "domfindus@gmail.com"
 const val GITHUB_URL = "https://github.com/VladLerkin/hirify-analytics"
 
@@ -28,6 +28,8 @@ fun AboutDialogContent(
     onOpenEmail: (String) -> Unit,
     onOpenUrl: (String) -> Unit
 ) {
+    val strings = LocalAppStrings.current
+    
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -36,7 +38,7 @@ fun AboutDialogContent(
         horizontalAlignment = Alignment.Start
     ) {
         Text(
-            text = APP_NAME,
+            text = strings.appName,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold
         )
@@ -47,7 +49,7 @@ fun AboutDialogContent(
         )
 
         Text(
-            text = "This program is free software.",
+            text = strings.freeSoftware,
             fontSize = 14.sp
         )
 
@@ -55,7 +57,7 @@ fun AboutDialogContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Author: ",
+                text = strings.author,
                 fontSize = 14.sp
             )
             TextButton(
@@ -73,7 +75,7 @@ fun AboutDialogContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "The source code is available on",
+                text = strings.sourceCodeAvailableOn,
                 fontSize = 14.sp
             )
             TextButton(
@@ -88,7 +90,7 @@ fun AboutDialogContent(
         }
 
         Text(
-            text = "Please send all comments and feedback to the email above.",
+            text = strings.feedbackEmail,
             fontSize = 14.sp,
             modifier = Modifier.fillMaxWidth()
         )
@@ -100,7 +102,7 @@ fun AboutDialogContent(
             horizontalArrangement = Arrangement.End
         ) {
             Button(onClick = onDismiss) {
-                Text("OK")
+                Text(strings.ok)
             }
         }
     }

@@ -29,10 +29,12 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.ui.graphics.Color
 import hirify.analytics.core.analytics.VacancyFilter
+import hirify.analytics.ui.i18n.LocalAppStrings
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
+    val strings = LocalAppStrings.current
     val viewModel = koinInject<MainViewModel>()
     val state by viewModel.state.collectAsState()
     
@@ -56,7 +58,7 @@ fun MainScreen() {
             containerColor = MaterialTheme.colorScheme.background,
             topBar = {
                 TopAppBar(
-                    title = { Text("hirify analytics", maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold) },
+                    title = { Text(strings.appName, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold) },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.background,
                         titleContentColor = MaterialTheme.colorScheme.onBackground
@@ -78,9 +80,9 @@ fun MainScreen() {
                                 )
                             ) {
                                 val buttonText = if (isRecording) {
-                                    if (isPortrait) "Stop" else "Stop Recording"
+                                    if (isPortrait) strings.stop else strings.stopRecording
                                 } else {
-                                    if (isPortrait) "Mic" else "Voice Dictation"
+                                    if (isPortrait) strings.mic else strings.voiceDictation
                                 }
                                 Text(buttonText, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
                             }
@@ -89,13 +91,13 @@ fun MainScreen() {
 
                         if (!isPortrait) {
                             IconButton(onClick = { uriHandler.openUri((state.seriesList.getOrNull(state.activeSeriesIndex)?.filter ?: VacancyFilter()).toHirifyWebUrl()) }) {
-                                Icon(Icons.Filled.OpenInBrowser, contentDescription = "Open in browser")
+                                Icon(Icons.Filled.OpenInBrowser, contentDescription = strings.openInBrowser)
                             }
                             IconButton(onClick = { navigator.push(AboutScreen()) }) {
-                                Icon(Icons.Filled.Info, contentDescription = "About")
+                                Icon(Icons.Filled.Info, contentDescription = strings.about)
                             }
                             IconButton(onClick = { navigator.push(AiSettingsScreen()) }) {
-                                Icon(androidx.compose.material.icons.Icons.Filled.Settings, contentDescription = "Settings")
+                                Icon(androidx.compose.material.icons.Icons.Filled.Settings, contentDescription = strings.settings)
                             }
                         } else {
                             Box {
@@ -107,7 +109,7 @@ fun MainScreen() {
                                     onDismissRequest = { showMenu = false }
                                 ) {
                                     DropdownMenuItem(
-                                        text = { Text("Open in browser") },
+                                        text = { Text(strings.openInBrowser) },
                                         onClick = { 
                                             showMenu = false
                                             uriHandler.openUri((state.seriesList.getOrNull(state.activeSeriesIndex)?.filter ?: VacancyFilter()).toHirifyWebUrl()) 
@@ -115,7 +117,7 @@ fun MainScreen() {
                                         leadingIcon = { Icon(Icons.Filled.OpenInBrowser, contentDescription = null) }
                                     )
                                     DropdownMenuItem(
-                                        text = { Text("About") },
+                                        text = { Text(strings.about) },
                                         onClick = { 
                                             showMenu = false
                                             navigator.push(AboutScreen()) 
@@ -123,7 +125,7 @@ fun MainScreen() {
                                         leadingIcon = { Icon(Icons.Filled.Info, contentDescription = null) }
                                     )
                                     DropdownMenuItem(
-                                        text = { Text("Settings") },
+                                        text = { Text(strings.settings) },
                                         onClick = { 
                                             showMenu = false
                                             navigator.push(AiSettingsScreen()) 
@@ -198,7 +200,7 @@ fun MainScreen() {
                                     Box(modifier = Modifier.size(8.dp).background(color, androidx.compose.foundation.shape.CircleShape))
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        text = series.filter.toShortLabel(),
+                                        text = series.filter.toShortLabel(strings),
                                         color = if (isSelected) color else MaterialTheme.colorScheme.onSurface,
                                         style = MaterialTheme.typography.labelLarge
                                     )
@@ -241,27 +243,27 @@ fun MainScreen() {
     }
 }
 
-fun VacancyFilter.toShortLabel(): String {
+fun VacancyFilter.toShortLabel(strings: hirify.analytics.ui.i18n.AppStrings): String {
     val parts = mutableListOf<String>()
     if (!skills.isNullOrEmpty()) parts.add(skills!!.split(",").first().trim())
     if (!specializations.isNullOrEmpty()) parts.add(specializations!!.split(",").first().trim())
     if (!grade.isNullOrEmpty()) {
         val gradeValue = grade!!.split(",").first().trim()
         val mappedGrade = when (gradeValue) {
-            "trainee" -> "Стажер"
-            "junior" -> "Джуниор"
-            "middle" -> "Мидл"
-            "senior" -> "Сеньор"
-            "lead" -> "Лид"
-            "head" -> "Head"
-            "director" -> "Директор"
-            "c_level" -> "C-level"
+            "trainee" -> strings.trainee
+            "junior" -> strings.junior
+            "middle" -> strings.middle
+            "senior" -> strings.senior
+            "lead" -> strings.lead
+            "head" -> strings.headGrade
+            "director" -> strings.director
+            "c_level" -> strings.cLevel
             else -> gradeValue
         }
         parts.add(mappedGrade)
     }
     
-    if (parts.isEmpty()) return "Все вакансии"
+    if (parts.isEmpty()) return strings.allVacancies
     val fullLabel = parts.joinToString(", ")
     return if (fullLabel.length > 20) fullLabel.take(17) + "..." else fullLabel
 }

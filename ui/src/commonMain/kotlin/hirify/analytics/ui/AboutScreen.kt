@@ -12,17 +12,19 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import hirify.analytics.ui.i18n.LocalAppStrings
 
 class AboutScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val strings = LocalAppStrings.current
         
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("About Hirify Analytics") },
+                    title = { Text(strings.appName) },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -39,7 +41,7 @@ class AboutScreen : Screen {
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = "Hirify Analytics",
+                    text = strings.appName,
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -51,22 +53,22 @@ class AboutScreen : Screen {
                 )
                 
                 Text(
-                    text = "This program is free software.",
+                    text = strings.freeSoftware,
                     fontSize = 16.sp
                 )
                 
                 Text(
-                    text = "Built with Kotlin Multiplatform and Compose Multiplatform for Android, Desktop, iOS, and Web.",
+                    text = strings.builtWith,
                     fontSize = 16.sp
                 )
                 
                 Text(
-                    text = "Source code is available on GitHub:\nhttps://github.com/VladLerkin/hirify-analytics",
+                    text = strings.sourceCodeAvailable + "https://github.com/VladLerkin/hirify-analytics",
                     fontSize = 16.sp
                 )
                 
                 Text(
-                    text = "Author: domfindus@gmail.com",
+                    text = "${strings.author}domfindus@gmail.com",
                     fontSize = 16.sp
                 )
             }

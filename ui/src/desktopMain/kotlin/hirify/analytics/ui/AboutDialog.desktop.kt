@@ -16,7 +16,7 @@ actual fun AboutDialog(onDismiss: () -> Unit) {
     DialogWindow(
         onCloseRequest = onDismiss,
         state = DialogState(width = 450.dp, height = 300.dp),
-        title = "About $APP_NAME",
+        title = "About Hirify Analytics",
         resizable = false
     ) {
         Surface(

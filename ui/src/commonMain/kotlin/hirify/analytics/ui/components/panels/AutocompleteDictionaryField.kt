@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import hirify.analytics.core.analytics.DictionaryItem
 import hirify.analytics.core.analytics.HirifyApiClient
+import hirify.analytics.ui.i18n.LocalAppStrings
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -33,6 +34,7 @@ fun AutocompleteDictionaryField(
     var suggestions by remember { mutableStateOf<List<DictionaryItem>>(emptyList()) }
     var searchJob by remember { mutableStateOf<Job?>(null) }
     val coroutineScope = rememberCoroutineScope()
+    val strings = LocalAppStrings.current
 
     LaunchedEffect(dictionary) {
         val result = apiClient.searchDictionary(dictionary, "")
@@ -87,7 +89,7 @@ fun AutocompleteDictionaryField(
                     performSearch(newValue)
                     expanded = true
                 },
-                placeholder = { Text("Поиск...") },
+                placeholder = { Text(strings.searchPlaceholder) },
                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable, true).fillMaxWidth(),
                 singleLine = true,
                 trailingIcon = {
@@ -145,7 +147,7 @@ fun AutocompleteDictionaryField(
                         trailingIcon = {
                             Icon(
                                 Icons.Default.Close,
-                                contentDescription = "Удалить",
+                                contentDescription = strings.delete,
                                 modifier = Modifier.size(16.dp)
                             )
                         }

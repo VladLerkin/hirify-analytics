@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.draw.scale
 import hirify.analytics.core.analytics.VacancyFilter
 import hirify.analytics.core.analytics.HirifyApiClient
+import hirify.analytics.ui.i18n.LocalAppStrings
 import org.koin.compose.koinInject
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.HelpOutline
@@ -29,6 +30,7 @@ fun LeftSidebar(
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
+    val strings = LocalAppStrings.current
 
     Column(
         modifier = modifier
@@ -38,35 +40,35 @@ fun LeftSidebar(
             .verticalScroll(scrollState)
     ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-            Text("Настроить источники", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
-            TextButton(onClick = { onFilterChanged(VacancyFilter()) }) {
-                Text("Сбросить", fontSize = 12.sp, color = MaterialTheme.colorScheme.tertiary)
+            Text(strings.configureSources, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
+            TextButton(onClick = { onFilterChanged(hirify.analytics.core.analytics.VacancyFilter()) }) {
+                Text(strings.reset, fontSize = 12.sp, color = MaterialTheme.colorScheme.tertiary)
             }
         }
         Spacer(modifier = Modifier.height(8.dp))
 
         // Work Format
         FilterSection(
-            title = "Формат работы",
-            tooltip = "Выберите формат: удаленная работа, гибридный формат (несколько дней в офисе) или полностью в офисе"
+            title = strings.workFormat,
+            tooltip = strings.workFormatTooltip
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                MultiSelectChip("Удаленно", "remote", filter.workFormat) { onFilterChanged(filter.copy(workFormat = it)) }
-                MultiSelectChip("Гибрид", "hybrid", filter.workFormat) { onFilterChanged(filter.copy(workFormat = it)) }
-                MultiSelectChip("В офисе", "onsite", filter.workFormat) { onFilterChanged(filter.copy(workFormat = it)) }
+                MultiSelectChip(strings.remote, "remote", filter.workFormat) { onFilterChanged(filter.copy(workFormat = it)) }
+                MultiSelectChip(strings.hybrid, "hybrid", filter.workFormat) { onFilterChanged(filter.copy(workFormat = it)) }
+                MultiSelectChip(strings.onsite, "onsite", filter.workFormat) { onFilterChanged(filter.copy(workFormat = it)) }
             }
         }
 
         // Remote Type
         FilterSection(
-            title = "Тип удаленки",
-            tooltip = "Укажите, откуда вы можете работать: Глобал (Worldwide), из РФ, из Европы и т.д. Часто работодатели ограничивают локацию даже для удаленки"
+            title = strings.remoteType,
+            tooltip = strings.remoteTypeTooltip
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                MultiSelectChip("Глобал", "global", filter.remoteType) { onFilterChanged(filter.copy(remoteType = it)) }
-                MultiSelectChip("РФ", "russia", filter.remoteType) { onFilterChanged(filter.copy(remoteType = it)) }
-                MultiSelectChip("Европа", "europe", filter.remoteType) { onFilterChanged(filter.copy(remoteType = it)) }
-                MultiSelectChip("США", "usa", filter.remoteType) { onFilterChanged(filter.copy(remoteType = it)) }
+                MultiSelectChip(strings.global, "global", filter.remoteType) { onFilterChanged(filter.copy(remoteType = it)) }
+                MultiSelectChip(strings.russia, "russia", filter.remoteType) { onFilterChanged(filter.copy(remoteType = it)) }
+                MultiSelectChip(strings.europe, "europe", filter.remoteType) { onFilterChanged(filter.copy(remoteType = it)) }
+                MultiSelectChip(strings.usa, "usa", filter.remoteType) { onFilterChanged(filter.copy(remoteType = it)) }
             }
         }
 
@@ -74,8 +76,8 @@ fun LeftSidebar(
 
         // Specializations
         FilterSection(
-            title = "Специализации",
-            tooltip = "Выберите одну или несколько профессий. Например, Frontend, Backend или QA"
+            title = strings.specializations,
+            tooltip = strings.specializationsTooltip
         ) {
             AutocompleteDictionaryField(
                 apiClient = apiClient,
@@ -88,11 +90,11 @@ fun LeftSidebar(
         
         // Skills
         FilterSection(
-            title = "Навыки",
-            tooltip = "Укажите технологии и инструменты. Переключатель И/ИЛИ позволяет искать вакансии, где требуются ВСЕ указанные навыки (И), либо ХОТЯ БЫ ОДИН из них (ИЛИ)",
+            title = strings.skills,
+            tooltip = strings.skillsTooltip,
             action = {
                 Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                    Text(if (filter.skillsMatchType == "AND") "И" else "ИЛИ", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(if (filter.skillsMatchType == "AND") strings.and else strings.or, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Switch(
                         checked = filter.skillsMatchType == "AND",
                         onCheckedChange = { isAnd ->
@@ -114,31 +116,31 @@ fun LeftSidebar(
 
         // Grade
         FilterSection(
-            title = "Грейд",
-            tooltip = "Требуемый уровень опыта кандидата: от стажера (Trainee) до руководителя (C-level)"
+            title = strings.grade,
+            tooltip = strings.gradeTooltip
         ) {
             FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                MultiSelectChip("Стажер", "trainee", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
-                MultiSelectChip("Джуниор", "junior", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
-                MultiSelectChip("Мидл", "middle", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
-                MultiSelectChip("Сеньор", "senior", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
-                MultiSelectChip("Лид", "lead", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
-                MultiSelectChip("Head", "head", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
-                MultiSelectChip("Директор", "director", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
-                MultiSelectChip("C-level", "c_level", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
+                MultiSelectChip(strings.trainee, "trainee", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
+                MultiSelectChip(strings.junior, "junior", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
+                MultiSelectChip(strings.middle, "middle", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
+                MultiSelectChip(strings.senior, "senior", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
+                MultiSelectChip(strings.lead, "lead", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
+                MultiSelectChip(strings.headGrade, "head", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
+                MultiSelectChip(strings.director, "director", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
+                MultiSelectChip(strings.cLevel, "c_level", filter.grade) { onFilterChanged(filter.copy(grade = it)) }
             }
         }
 
         // Company Type
         FilterSection(
-            title = "Тип компании",
-            tooltip = "Выберите, где вам комфортнее работать: в стартапе, корпорации, продуктовой компании или в аутсорсе"
+            title = strings.companyType,
+            tooltip = strings.companyTypeTooltip
         ) {
             FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                MultiSelectChip("Стартап", "startup", filter.companyType) { onFilterChanged(filter.copy(companyType = it)) }
-                MultiSelectChip("Корпорация", "corporation", filter.companyType) { onFilterChanged(filter.copy(companyType = it)) }
-                MultiSelectChip("Продуктовая компания", "product_company", filter.companyType) { onFilterChanged(filter.copy(companyType = it)) }
-                MultiSelectChip("Аутсорс компания", "outsourcing_company", filter.companyType) { onFilterChanged(filter.copy(companyType = it)) }
+                MultiSelectChip(strings.startup, "startup", filter.companyType) { onFilterChanged(filter.copy(companyType = it)) }
+                MultiSelectChip(strings.corporation, "corporation", filter.companyType) { onFilterChanged(filter.copy(companyType = it)) }
+                MultiSelectChip(strings.productCompany, "product_company", filter.companyType) { onFilterChanged(filter.copy(companyType = it)) }
+                MultiSelectChip(strings.outsourcingCompany, "outsourcing_company", filter.companyType) { onFilterChanged(filter.copy(companyType = it)) }
             }
         }
     }
