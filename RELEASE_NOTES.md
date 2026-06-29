@@ -1,6 +1,6 @@
 # Hirify Analytics Release Notes
 
-## v1.0.11 (June 2026)
+## v1.0.12 (June 2026)
 * **Dependency Updates:** Safely bumped multiple libraries (Ktor, llamatik, Koin, JNA, Compose BOM) to their latest stable versions.
 * **CI Improvements:** Added concurrency blocks to GitHub Actions releases to prevent duplicate overlapping runs.
 * **Tooling:** Introduced a python script (`check_updates.py`) to easily check and monitor dependency updates.
