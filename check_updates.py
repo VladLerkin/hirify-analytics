@@ -186,9 +186,6 @@ def check_dependencies():
             print(f"{v_ref:<25} | {current_ver:<15} | {'Not Found':<15} | {'Not Found':<15} | {'Error':<10} | Could not fetch maven metadata for {group}:{name}")
             continue
             
-        # Filter out weird Voyager versions that are not real standard releases
-        if v_ref == 'voyager':
-            all_versions = [v for v in all_versions if not v.startswith('2.2.')]
             
         # Sort versions using our comparator
         sorted_versions = sorted(all_versions, key=cmp_to_key(compare_versions))
