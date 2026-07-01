@@ -1,5 +1,8 @@
 # Hirify Analytics Release Notes
 
+## v1.0.14 (July 2026)
+* **Release Process Improvements:** Extracted version bumping logic into a dedicated script (`up_versions.sh`) for a more deterministic release process. Updated the AI workflow to execute this step explicitly.
+
 ## v1.0.13 (July 2026)
 * **Dependency Updates:** Updated Voyager to version `2.2.21-1.10.3`.
 * **Tooling Fixes:** Removed filter in `check_updates.py` to allow correctly checking Voyager dependencies. Fixed release script to prevent version skipping.
