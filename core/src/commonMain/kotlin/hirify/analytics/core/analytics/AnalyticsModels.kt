@@ -44,6 +44,16 @@ data class VacancyFilter(
             params.add("skills=${skillz.encodeURLQueryComponent()}")
             skillsMatchType?.let { match -> params.add("skills_match_type=${match.encodeURLQueryComponent()}") }
         }
+        title?.takeIf { it.isNotBlank() }?.let { params.add("search=${it.encodeURLQueryComponent()}") }
+        country?.let { params.add("countries=${it.encodeURLQueryComponent()}") }
+        macroregion?.let { params.add("regions=${it.encodeURLQueryComponent()}") }
+        employeeType?.let { params.add("employee_type=${it.encodeURLQueryComponent()}") }
+        englishLevel?.let { params.add("english_level=${it.encodeURLQueryComponent()}") }
+        vacancyLanguage?.let { params.add("vacancy_language=${it.encodeURLQueryComponent()}") }
+        status?.takeIf { it != "all" }?.let { params.add("status=${it.encodeURLQueryComponent()}") }
+        source?.let { params.add("sources_filter=${it.encodeURLQueryComponent()}") }
+        sourceSecondary?.let { params.add("source_secondary=${it.encodeURLQueryComponent()}") }
+        if (includeScam == true) { params.add("include_scam=true") }
         
         return if (params.isEmpty()) baseUrl else "$baseUrl?${params.joinToString("&")}"
     }

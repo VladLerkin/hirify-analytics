@@ -1,5 +1,8 @@
 # Hirify Analytics Release Notes
 
+## v1.0.16 (July 2026)
+* **Web Integration Fixes:** Fixed the URL mapping in `toHirifyWebUrl()` to correctly pass missing filters (`title`, `country`, `macroregion`, `source`) using the exact keys (`search`, `countries`, `regions`, `sources_filter`) expected by the frontend on `hirify.me`.
+
 ## v1.0.15 (July 2026)
 * **Expanded Analytics Filters:** Exposed all analytical API filter parameters in the UI, including Work Format, Remote Type, Specializations, Skills, Grade, Company Type, Employee Type, English Level, Vacancy Language, Status, Primary Source, and Include Scam.
 * **Improved UX & Dictionary Autocomplete:** Added autocomplete suggestion dropdowns for Specializations, Skills, Countries (Страны), and Geo-regions (Гео-регионы).
