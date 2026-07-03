@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# up_versions.sh
+# up_version.sh
 # Automates bumping the app-version (PATCH) and app-versionCode in gradle/libs.versions.toml
 
 set -e

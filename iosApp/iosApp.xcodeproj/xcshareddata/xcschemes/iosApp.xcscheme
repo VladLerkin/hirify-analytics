@@ -43,7 +43,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "F1539D1CD7C4FCF00F3246DC"
-            BuildableName = "FamilyTree.app"
+            BuildableName = "hirify-analytics.app"
             BlueprintName = "iosApp"
             ReferencedContainer = "container:iosApp.xcodeproj">
          </BuildableReference>

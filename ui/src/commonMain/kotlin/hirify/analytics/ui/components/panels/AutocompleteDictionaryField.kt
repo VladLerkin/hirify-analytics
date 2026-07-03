@@ -22,6 +22,7 @@ fun AutocompleteDictionaryField(
     dictionary: String,
     currentValue: String?,
     onValueChanged: (String?) -> Unit,
+    placeholder: String? = null,
     modifier: Modifier = Modifier
 ) {
     val selectedItems = remember(currentValue) { 
@@ -89,7 +90,7 @@ fun AutocompleteDictionaryField(
                     performSearch(newValue)
                     expanded = true
                 },
-                placeholder = { Text(strings.searchPlaceholder) },
+                placeholder = { Text(placeholder ?: strings.searchPlaceholder) },
                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable, true).fillMaxWidth(),
                 singleLine = true,
                 trailingIcon = {

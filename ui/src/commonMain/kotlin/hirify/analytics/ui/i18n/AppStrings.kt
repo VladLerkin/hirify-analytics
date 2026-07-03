@@ -57,6 +57,40 @@ interface AppStrings {
     val outsourcingCompany: String
     val searchPlaceholder: String
     val delete: String
+    val titleFilter: String
+    val titleFilterTooltip: String
+    val titleFilterPlaceholder: String
+    val country: String
+    val countryTooltip: String
+    val macroregion: String
+    val macroregionTooltip: String
+    val searchCountriesPlaceholder: String
+    val searchGeoRegionsPlaceholder: String
+    val searchSpecializationsPlaceholder: String
+    val searchSkillsPlaceholder: String
+    val employeeType: String
+    val employeeTypeTooltip: String
+    val employment: String
+    val b2bContract: String
+    val vacancyLanguage: String
+    val vacancyLanguageTooltip: String
+    val russian: String
+    val english: String
+    val englishLevel: String
+    val englishLevelTooltip: String
+    val status: String
+    val statusTooltip: String
+    val all: String
+    val active: String
+    val archived: String
+    val includeScam: String
+    val includeScamTooltip: String
+    val source: String
+    val sourceTooltip: String
+    val scout: String
+    val telegram: String
+    val verified: String
+    val recruiter: String
     
     // About
     val freeSoftware: String
@@ -176,6 +210,40 @@ object EnStrings : AppStrings {
     override val outsourcingCompany = "Outsourcing company"
     override val searchPlaceholder = "Search..."
     override val delete = "Delete"
+    override val titleFilter = "Search by title"
+    override val titleFilterTooltip = "Search by job title or aliases, comma-separated (e.g. devops, sre)"
+    override val titleFilterPlaceholder = "e.g. devops, sre"
+    override val country = "Countries"
+    override val countryTooltip = "Filter by one or more countries (Germany, Cyprus, etc.)"
+    override val macroregion = "Geo-regions"
+    override val macroregionTooltip = "Filter by geographic macroregion segments (europe, cis, usa, etc.)"
+    override val searchCountriesPlaceholder = "Search countries"
+    override val searchGeoRegionsPlaceholder = "Search geo-regions"
+    override val searchSpecializationsPlaceholder = "Search specializations"
+    override val searchSkillsPlaceholder = "Search skills"
+    override val employeeType = "Employee type"
+    override val employeeTypeTooltip = "Employment type (staff or B2B contract)"
+    override val employment = "Staff"
+    override val b2bContract = "B2B Contract"
+    override val vacancyLanguage = "Vacancy language"
+    override val vacancyLanguageTooltip = "Language of the vacancy description (Russian or English)"
+    override val russian = "Russian"
+    override val english = "English"
+    override val englishLevel = "English level"
+    override val englishLevelTooltip = "Required English level (A1 to C2)"
+    override val status = "Status"
+    override val statusTooltip = "Filter active, archived, or all vacancies"
+    override val all = "All"
+    override val active = "Active"
+    override val archived = "Archived"
+    override val includeScam = "Include suspicious"
+    override val includeScamTooltip = "Show vacancies that look like spam/scam"
+    override val source = "Source"
+    override val sourceTooltip = "Primary source of the vacancy"
+    override val scout = "Websites"
+    override val telegram = "Telegram"
+    override val verified = "Verified"
+    override val recruiter = "Recruiters"
     
     override val freeSoftware = "This program is free software."
     override val builtWith = "Built with Kotlin Multiplatform and Compose Multiplatform for Android, Desktop, iOS, and Web."
@@ -291,6 +359,40 @@ object RuStrings : AppStrings {
     override val outsourcingCompany = "Аутсорс компания"
     override val searchPlaceholder = "Поиск..."
     override val delete = "Удалить"
+    override val titleFilter = "Поиск по названию"
+    override val titleFilterTooltip = "Поиск по названию вакансии или её алиасам через запятую (например, devops, sre)"
+    override val titleFilterPlaceholder = "например, devops, sre"
+    override val country = "Страны"
+    override val countryTooltip = "Фильтр по одной или нескольким странам (Германия, Кипр и т.д.)"
+    override val macroregion = "Гео-регионы"
+    override val macroregionTooltip = "Фильтр по географическим сегментам (Европа, РФ, СНГ, США и т.д.)"
+    override val searchCountriesPlaceholder = "Искать страны"
+    override val searchGeoRegionsPlaceholder = "Искать гео-регионы"
+    override val searchSpecializationsPlaceholder = "Искать специализации"
+    override val searchSkillsPlaceholder = "Искать навыки"
+    override val employeeType = "Тип занятости"
+    override val employeeTypeTooltip = "Формат оформления (в штат или B2B контракт)"
+    override val employment = "Штат"
+    override val b2bContract = "B2B-контракт"
+    override val vacancyLanguage = "Язык вакансии"
+    override val vacancyLanguageTooltip = "Язык описания вакансии (русский или английский)"
+    override val russian = "Русский"
+    override val english = "Английский"
+    override val englishLevel = "Уровень английского"
+    override val englishLevelTooltip = "Требуемый уровень владения английским языком (от A1 до C2)"
+    override val status = "Статус вакансии"
+    override val statusTooltip = "Показывать только активные, только архивные или все вакансии"
+    override val all = "Все"
+    override val active = "Активные"
+    override val archived = "Архивные"
+    override val includeScam = "Показывать подозрительные"
+    override val includeScamTooltip = "Включать в выборку вакансии, которые похожи на спам или скам"
+    override val source = "Первичный источник"
+    override val sourceTooltip = "Откуда была получена вакансия"
+    override val scout = "Сайты компаний"
+    override val telegram = "Telegram"
+    override val verified = "Проверенные"
+    override val recruiter = "Рекрутеры"
     
     override val freeSoftware = "Эта программа является свободным программным обеспечением."
     override val builtWith = "Создано с использованием Kotlin Multiplatform и Compose Multiplatform для Android, Desktop, iOS и Web."

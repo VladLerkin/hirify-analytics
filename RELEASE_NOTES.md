@@ -1,7 +1,12 @@
 # Hirify Analytics Release Notes
 
+## v1.0.15 (July 2026)
+* **Expanded Analytics Filters:** Exposed all analytical API filter parameters in the UI, including Work Format, Remote Type, Specializations, Skills, Grade, Company Type, Employee Type, English Level, Vacancy Language, Status, Primary Source, and Include Scam.
+* **Improved UX & Dictionary Autocomplete:** Added autocomplete suggestion dropdowns for Specializations, Skills, Countries (Страны), and Geo-regions (Гео-регионы).
+* **UI Order Alignment:** Aligned the sidebar filter layout, labels, and placeholders to match the official hirify.me website.
+
 ## v1.0.14 (July 2026)
-* **Release Process Improvements:** Extracted version bumping logic into a dedicated script (`up_versions.sh`) for a more deterministic release process. Updated the AI workflow to execute this step explicitly.
+* **Release Process Improvements:** Extracted version bumping logic into a dedicated script (`up_version.sh`) for a more deterministic release process. Updated the AI workflow to execute this step explicitly.
 
 ## v1.0.13 (July 2026)
 * **Dependency Updates:** Updated Voyager to version `2.2.21-1.10.3`.
