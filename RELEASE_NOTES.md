@@ -1,5 +1,8 @@
 # Hirify Analytics Release Notes
 
+## v1.0.17 (July 2026)
+* **UI Bug Fix:** Fixed a logic bug in the Status filter (All, Active, Archived) where multiple mutually exclusive options could be selected simultaneously. The filter now correctly acts as a single-select choice.
+
 ## v1.0.16 (July 2026)
 * **Web Integration Fixes:** Fixed the URL mapping in `toHirifyWebUrl()` to correctly pass missing filters (`title`, `country`, `macroregion`, `source`) using the exact keys (`search`, `countries`, `regions`, `sources_filter`) expected by the frontend on `hirify.me`.
 

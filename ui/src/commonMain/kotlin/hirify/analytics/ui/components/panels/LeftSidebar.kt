@@ -273,9 +273,28 @@ fun LeftSidebar(
             tooltip = strings.statusTooltip
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                MultiSelectChip(strings.all, "all", filter.status) { onFilterChanged(filter.copy(status = it)) }
-                MultiSelectChip(strings.active, "active", filter.status) { onFilterChanged(filter.copy(status = it)) }
-                MultiSelectChip(strings.archived, "archived", filter.status) { onFilterChanged(filter.copy(status = it)) }
+                val currentStatus = filter.status ?: "all"
+                CompactFilterChip(
+                    selected = currentStatus == "all",
+                    onClick = { onFilterChanged(filter.copy(status = "all")) },
+                    label = strings.all
+                )
+                CompactFilterChip(
+                    selected = currentStatus == "active",
+                    onClick = { 
+                        if (currentStatus == "active") onFilterChanged(filter.copy(status = "all"))
+                        else onFilterChanged(filter.copy(status = "active")) 
+                    },
+                    label = strings.active
+                )
+                CompactFilterChip(
+                    selected = currentStatus == "archived",
+                    onClick = { 
+                        if (currentStatus == "archived") onFilterChanged(filter.copy(status = "all"))
+                        else onFilterChanged(filter.copy(status = "archived")) 
+                    },
+                    label = strings.archived
+                )
             }
         }
     }
