@@ -1,5 +1,8 @@
 # Hirify Analytics Release Notes
 
+## v1.0.18 (July 2026)
+* **Dependency Updates:** Updated Gradle wrapper to version `9.6.1` and Kotlin to `2.4.10`, along with synchronizing corresponding versions in project documentation.
+
 ## v1.0.17 (July 2026)
 * **UI Bug Fix:** Fixed a logic bug in the Status filter (All, Active, Archived) where multiple mutually exclusive options could be selected simultaneously. The filter now correctly acts as a single-select choice.
 

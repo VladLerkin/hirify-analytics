@@ -2,9 +2,9 @@
 
 > A cross-platform HR analytics and job market analysis tool built with Kotlin Multiplatform and Compose Multiplatform.
 
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.4.0-blue.svg?logo=kotlin)](http://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.4.10-blue.svg?logo=kotlin)](http://kotlinlang.org)
 [![Compose Multiplatform](https://img.shields.io/badge/Compose%20Multiplatform-1.11.1-brightgreen)](https://www.jetbrains.com/lp/compose-multiplatform/)
-[![Gradle](https://img.shields.io/badge/Gradle-9.5.1-02303A.svg?logo=gradle)](https://gradle.org)
+[![Gradle](https://img.shields.io/badge/Gradle-9.6.1-02303A.svg?logo=gradle)](https://gradle.org)
 
 ## ✨ Features
 
@@ -85,11 +85,11 @@ The project uses **Gradle Version Catalog** for centralized dependency managemen
 
 | Component | Version |
 |-----------|---------|
-| Kotlin | 2.4.0 |
+| Kotlin | 2.4.10 |
 | Compose Multiplatform | 1.11.1 |
-| Android Compose BOM | 2026.06.00 |
-| Gradle | 9.5.1 |
-| Android Gradle Plugin | 9.2.1 |
+| Android Compose BOM | 2026.06.01 |
+| Gradle | 9.6.1 |
+| Android Gradle Plugin | 9.3.0 |
 | Ktor | 3.5.1 |
 | JDK | 25 |
 
