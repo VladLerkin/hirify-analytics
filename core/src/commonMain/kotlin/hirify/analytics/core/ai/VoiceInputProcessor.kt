@@ -21,20 +21,20 @@ class VoiceInputProcessor(
 ) {
     private var autoStopJob: Job? = null
 
-    private val _isRecording = MutableStateFlow(false)
-    val isRecording: StateFlow<Boolean> = _isRecording.asStateFlow()
+    val isRecording: StateFlow<Boolean>
+        field = MutableStateFlow(false)
 
-    private val _isProcessing = MutableStateFlow(false)
-    val isProcessing: StateFlow<Boolean> = _isProcessing.asStateFlow()
+    val isProcessing: StateFlow<Boolean>
+        field = MutableStateFlow(false)
 
-    private val _lastResult = MutableStateFlow<VacancyFilter?>(null)
-    val lastResult: StateFlow<VacancyFilter?> = _lastResult.asStateFlow()
+    val lastResult: StateFlow<VacancyFilter?>
+        field = MutableStateFlow(null)
 
-    private val _errorMessage = MutableStateFlow<String?>(null)
-    val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
+    val errorMessage: StateFlow<String?>
+        field = MutableStateFlow(null)
 
     fun toggleRecording() {
-        if (_isRecording.value) {
+        if (isRecording.value) {
             stopRecording()
         } else {
             startRecording()
@@ -42,31 +42,31 @@ class VoiceInputProcessor(
     }
 
     private fun startRecording() {
-        _errorMessage.value = null
+        errorMessage.value = null
         try {
             voiceRecorder.startRecording(
                 onResult = { audioData ->
-                    _isRecording.value = false
+                    isRecording.value = false
                     autoStopJob?.cancel()
                     processAudio(audioData)
                 },
                 onError = { error ->
-                    _isRecording.value = false
+                    isRecording.value = false
                     autoStopJob?.cancel()
-                    _errorMessage.value = error
+                    errorMessage.value = error
                 }
             )
-            _isRecording.value = true
+            isRecording.value = true
             
             autoStopJob?.cancel()
             autoStopJob = coroutineScope.launch {
                 delay(3 * 60 * 1000L) // 3 minutes
-                if (_isRecording.value) {
+                if (isRecording.value) {
                     stopRecording()
                 }
             }
         } catch (e: Exception) {
-            _errorMessage.value = "Failed to start recording. Check permissions."
+            errorMessage.value = "Failed to start recording. Check permissions."
         }
     }
 
@@ -76,7 +76,7 @@ class VoiceInputProcessor(
     }
 
     private fun processAudio(audioData: ByteArray) {
-        _isProcessing.value = true
+        isProcessing.value = true
         coroutineScope.launch {
             try {
                 val config = settingsStorage.loadConfig()
@@ -85,17 +85,17 @@ class VoiceInputProcessor(
                 
                 if (transcript.isNotBlank()) {
                     val filter = agentService.parseVoiceToFilter(transcript, config)
-                    _lastResult.value = filter
+                    lastResult.value = filter
                 }
             } catch (e: Exception) {
-                _errorMessage.value = e.message ?: "Transcription failed"
+                errorMessage.value = e.message ?: "Transcription failed"
             } finally {
-                _isProcessing.value = false
+                isProcessing.value = false
             }
         }
     }
     
     fun clearResult() {
-        _lastResult.update { null }
+        lastResult.update { null }
     }
 }

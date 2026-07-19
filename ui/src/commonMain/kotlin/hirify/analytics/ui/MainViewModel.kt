@@ -33,8 +33,8 @@ class MainViewModel(
 
     val voiceInputProcessor = voiceInputProcessorFactory(viewModelScope)
 
-    private val _state = MutableStateFlow(MainState())
-    val state: StateFlow<MainState> = _state.asStateFlow()
+    val state: StateFlow<MainState>
+        field = MutableStateFlow(MainState())
 
     init {
         loadDataForSeries(0)
@@ -50,8 +50,8 @@ class MainViewModel(
     }
 
     fun updateFilter(filter: VacancyFilter) {
-        val currentIndex = _state.value.activeSeriesIndex
-        _state.update { state ->
+        val currentIndex = state.value.activeSeriesIndex
+        state.update { state ->
             val updatedList = state.seriesList.toMutableList()
             updatedList[currentIndex] = updatedList[currentIndex].copy(filter = filter)
             state.copy(seriesList = updatedList)
@@ -60,17 +60,17 @@ class MainViewModel(
     }
 
     fun addSeries() {
-        if (_state.value.seriesList.size >= 5) return
-        _state.update { state ->
+        if (state.value.seriesList.size >= 5) return
+        state.update { state ->
             val newList = state.seriesList + ChartSeries(filter = VacancyFilter())
             state.copy(seriesList = newList, activeSeriesIndex = newList.lastIndex)
         }
-        loadDataForSeries(_state.value.seriesList.lastIndex)
+        loadDataForSeries(state.value.seriesList.lastIndex)
     }
 
     fun removeSeries(index: Int) {
-        if (_state.value.seriesList.size <= 1) return
-        _state.update { state ->
+        if (state.value.seriesList.size <= 1) return
+        state.update { state ->
             val newList = state.seriesList.toMutableList().apply { removeAt(index) }
             val newActiveIndex = if (state.activeSeriesIndex >= newList.size) newList.lastIndex else state.activeSeriesIndex
             state.copy(seriesList = newList, activeSeriesIndex = newActiveIndex)
@@ -78,13 +78,13 @@ class MainViewModel(
     }
 
     fun selectSeries(index: Int) {
-        if (index in _state.value.seriesList.indices) {
-            _state.update { it.copy(activeSeriesIndex = index) }
+        if (index in state.value.seriesList.indices) {
+            state.update { it.copy(activeSeriesIndex = index) }
         }
     }
 
     fun reload() {
-        val currentIndex = _state.value.activeSeriesIndex
+        val currentIndex = state.value.activeSeriesIndex
         loadDataForSeries(currentIndex)
     }
 
@@ -93,21 +93,21 @@ class MainViewModel(
     }
 
     private fun loadDataForSeries(index: Int) {
-        if (index !in _state.value.seriesList.indices) return
+        if (index !in state.value.seriesList.indices) return
 
         viewModelScope.launch(Dispatchers.Default) {
-            _state.update { state ->
+            state.update { state ->
                 val updatedList = state.seriesList.toMutableList()
                 updatedList[index] = updatedList[index].copy(isLoading = true, error = null)
                 state.copy(seriesList = updatedList)
             }
 
-            val filter = _state.value.seriesList[index].filter
+            val filter = state.value.seriesList[index].filter
             val result = apiClient.getAnalyticsCount(filter)
             
             result
                     .onSuccess { response ->
-                        _state.update { state ->
+                        state.update { state ->
                             val updatedList = state.seriesList.toMutableList()
                             if (index < updatedList.size) { // check bounds in case it was removed
                                 updatedList[index] = updatedList[index].copy(data = response, isLoading = false)
@@ -116,7 +116,7 @@ class MainViewModel(
                         }
                     }
                     .onFailure { error ->
-                        _state.update { state ->
+                        state.update { state ->
                             val updatedList = state.seriesList.toMutableList()
                             if (index < updatedList.size) {
                                 updatedList[index] = updatedList[index].copy(error = error.message, isLoading = false)

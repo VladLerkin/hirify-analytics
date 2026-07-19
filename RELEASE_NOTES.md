@@ -1,5 +1,8 @@
 # Hirify Analytics Release Notes
 
+## v1.0.19 (July 2026)
+* **Code Simplification:** Migrated state properties in `MainViewModel` and `VoiceInputProcessor` to use Kotlin's new explicit backing fields (`field`) syntax for cleaner code.
+
 ## v1.0.18 (July 2026)
 * **Dependency Updates:** Updated Gradle wrapper to version `9.6.1` and Kotlin to `2.4.10`, along with synchronizing corresponding versions in project documentation.
 
