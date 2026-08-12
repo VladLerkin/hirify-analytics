@@ -1,5 +1,8 @@
 # Hirify Analytics Release Notes
 
+## v1.0.21 (August 2026)
+* **Dependency Updates:** Updated Gradle wrapper to version `9.7.0` and synchronized corresponding versions in project documentation.
+
 ## v1.0.20 (August 2026)
 * **Dependency Updates:** Updated stable dependencies to their latest versions: Android Gradle Plugin (`9.3.1`), Ktor (`3.5.2`), and llamatik (`1.10.0`).
 
