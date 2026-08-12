@@ -1,13 +1,13 @@
 [versions]
 kotlin = "2.4.10"
-compose = "1.12.0-rc01"
+compose = "1.11.1"
 agp = "9.3.1"
 android-compileSdk = "37"
 android-minSdk = "26"
 android-targetSdk = "37"
 java = "25"
-app-version = "1.0.22"
-app-versionCode = "23"
+app-version = "1.0.23"
+app-versionCode = "24"
 ktor = "3.5.2"
 
 llamatik = "1.10.0"

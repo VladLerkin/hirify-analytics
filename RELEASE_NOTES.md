@@ -1,5 +1,8 @@
 # Hirify Analytics Release Notes
 
+## v1.0.23 (August 2026)
+* **Build Fixes:** Downgraded Gradle wrapper to version `9.6.1` and fixed a version conflict with the Compose Multiplatform plugin (`1.11.1`).
+
 ## v1.0.21 (August 2026)
 * **Dependency Updates:** Updated Gradle wrapper to version `9.7.0` and synchronized corresponding versions in project documentation.
 
