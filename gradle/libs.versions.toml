@@ -1,16 +1,16 @@
 [versions]
 kotlin = "2.4.10"
 compose = "1.11.1"
-agp = "9.3.0"
+agp = "9.3.1"
 android-compileSdk = "37"
 android-minSdk = "26"
 android-targetSdk = "37"
 java = "25"
-app-version = "1.0.19"
-app-versionCode = "20"
-ktor = "3.5.1"
+app-version = "1.0.20"
+app-versionCode = "21"
+ktor = "3.5.2"
 
-llamatik = "1.9.0"
+llamatik = "1.10.0"
 serialization = "1.11.0"
 androidx-security = "1.1.0"
 

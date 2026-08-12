@@ -1,5 +1,8 @@
 # Hirify Analytics Release Notes
 
+## v1.0.20 (August 2026)
+* **Dependency Updates:** Updated stable dependencies to their latest versions: Android Gradle Plugin (`9.3.1`), Ktor (`3.5.2`), and llamatik (`1.10.0`).
+
 ## v1.0.19 (July 2026)
 * **Code Simplification:** Migrated state properties in `MainViewModel` and `VoiceInputProcessor` to use Kotlin's new explicit backing fields (`field`) syntax for cleaner code.
 
