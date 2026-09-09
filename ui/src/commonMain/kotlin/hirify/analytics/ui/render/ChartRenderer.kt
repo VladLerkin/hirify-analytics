@@ -40,6 +40,21 @@ fun ChartRenderer(
         return
     }
 
+    val today = getCurrentDateInfo()
+    val currentMonthKey = "${today.year}-${today.month.toString().padStart(2, '0')}"
+    val daysInMonth = today.daysInMonth
+    val daysPassed = today.dayOfMonth
+
+    val extrapolatedSeriesData = activeSeriesData.map { series ->
+        val parsedBuckets = series.data!!.getParsedBuckets().toMutableMap()
+        if (parsedBuckets.containsKey(currentMonthKey) && daysPassed > 0) {
+            val currentValue = parsedBuckets[currentMonthKey] ?: 0
+            val extrapolatedValue = (currentValue.toDouble() / daysPassed * daysInMonth).toInt()
+            parsedBuckets[currentMonthKey] = extrapolatedValue
+        }
+        series to parsedBuckets
+    }
+
     val textMeasurer = rememberTextMeasurer()
 
     Canvas(modifier = modifier.fillMaxSize().padding(16.dp)) {
@@ -53,7 +68,7 @@ fun ChartRenderer(
         val graphHeight = height - 2 * paddingY
 
         // Collect all buckets to find global min/max for axes scaling
-        val rawKeys = activeSeriesData.flatMap { it.data!!.getParsedBuckets().keys }.distinct().sorted()
+        val rawKeys = extrapolatedSeriesData.flatMap { it.second.keys }.distinct().sorted()
         
         val completeKeys = mutableListOf<String>()
         if (rawKeys.isNotEmpty()) {
@@ -81,7 +96,7 @@ fun ChartRenderer(
             }
         }
 
-        val maxCount = activeSeriesData.flatMap { it.data!!.getParsedBuckets().values }.maxOrNull()?.coerceAtLeast(1) ?: 1
+        val maxCount = extrapolatedSeriesData.flatMap { it.second.values }.maxOrNull()?.coerceAtLeast(1) ?: 1
 
         val stepX = if (completeKeys.size > 1) graphWidth / (completeKeys.size - 1) else graphWidth
         val scaleY = graphHeight / maxCount
@@ -149,35 +164,52 @@ fun ChartRenderer(
         }
 
         // Draw lines for each series
-        seriesList.forEachIndexed { seriesIndex, series ->
-            val data = series.data ?: return@forEachIndexed
-            val buckets = data.getParsedBuckets()
+        extrapolatedSeriesData.forEachIndexed { seriesIndex, (series, buckets) ->
             if (buckets.isEmpty()) return@forEachIndexed
             
             val lineColor = chartColors[seriesIndex % chartColors.size]
-            val path = Path()
+            val solidPath = Path()
+            val dashedPath = Path()
             
             var isFirst = true
+            var prevX = 0f
+            var prevY = 0f
             completeKeys.forEachIndexed { index, key ->
                 val value = buckets[key] ?: 0
                 val x = paddingX + index * stepX
                 val y = height - paddingY - (value * scaleY)
                 
                 if (isFirst) {
-                    path.moveTo(x, y)
+                    solidPath.moveTo(x, y)
                     isFirst = false
                 } else {
-                    path.lineTo(x, y)
+                    if (key == currentMonthKey && daysPassed > 0) {
+                        dashedPath.moveTo(prevX, prevY)
+                        dashedPath.lineTo(x, y)
+                        solidPath.moveTo(x, y)
+                    } else {
+                        solidPath.lineTo(x, y)
+                    }
                 }
                 
                 drawCircle(color = lineColor, radius = 4.dp.toPx(), center = Offset(x, y))
+                prevX = x
+                prevY = y
             }
             
             if (!isFirst) {
                 drawPath(
-                    path = path,
+                    path = solidPath,
                     color = lineColor,
                     style = Stroke(width = 3.dp.toPx())
+                )
+                drawPath(
+                    path = dashedPath,
+                    color = lineColor,
+                    style = Stroke(
+                        width = 3.dp.toPx(),
+                        pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(15f, 15f), 0f)
+                    )
                 )
             }
         }

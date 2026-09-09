@@ -1,5 +1,10 @@
 # Hirify Analytics Release Notes
 
+## v1.0.26 (September 2026)
+* **Chart Data Extrapolation:** Implemented extrapolation for the current month's incomplete data based on the number of days passed, preventing the chart from falsely dipping at the end.
+* **UI Improvements:** The extrapolated segment of the chart is now visually distinguished with a dashed line to indicate forecasted data.
+* **Stability:** Migrated date processing from third-party libraries to native multiplatform `expect`/`actual` implementations, eliminating JVM classloading issues on desktop.
+
 ## v1.0.25 (September 2026)
 * **Bug Fixes:** Fixed chart x-axis rendering to show consistent periods and correctly handle missing data. Also resolved an issue where tab state (like uncommitted search queries) was incorrectly retained across newly created tabs.
 * **Agent Skills:** Refactored the release workflow to comply with the Agent Skills specification and added a new `check-updates` skill for automated dependency tracking.
