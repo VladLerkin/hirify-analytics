@@ -1,5 +1,9 @@
 # Hirify Analytics Release Notes
 
+## v1.0.25 (September 2026)
+* **Bug Fixes:** Fixed chart x-axis rendering to show consistent periods and correctly handle missing data. Also resolved an issue where tab state (like uncommitted search queries) was incorrectly retained across newly created tabs.
+* **Agent Skills:** Refactored the release workflow to comply with the Agent Skills specification and added a new `check-updates` skill for automated dependency tracking.
+
 ## v1.0.24 (September 2026)
 * **Code Maintenance:** Reorganized utility scripts into a dedicated `scripts/` directory for better project structure.
 * **Documentation:** Updated AI workflows and application documentation to reflect the new script locations.
