@@ -153,10 +153,12 @@ fun MainScreen() {
                 ) {
                     val activeSeries = state.seriesList.getOrNull(state.activeSeriesIndex)
                     if (activeSeries != null) {
-                        LeftSidebar(
-                            filter = activeSeries.filter,
-                            onFilterChanged = { viewModel.updateFilter(it) }
-                        )
+                        androidx.compose.runtime.key(activeSeries.id) {
+                            LeftSidebar(
+                                filter = activeSeries.filter,
+                                onFilterChanged = { viewModel.updateFilter(it) }
+                            )
+                        }
                     }
                 }
             }

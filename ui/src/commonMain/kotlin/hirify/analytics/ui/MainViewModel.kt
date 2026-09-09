@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class ChartSeries(
+        val id: Long = kotlin.random.Random.nextLong(),
         val filter: VacancyFilter = VacancyFilter(),
         val data: CountResponse? = null,
         val isLoading: Boolean = false,
