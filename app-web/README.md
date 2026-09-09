@@ -67,8 +67,8 @@ app-web/
 - Не все системные диалоги могут работать из браузера.
 
 ### Технические детали
-- **Kotlin**: 2.4.0
-- **Compose Multiplatform**: 1.11.1
+- **Kotlin**: 2.4.20
+- **Compose Multiplatform**: 1.12.0
 - **Vite**: 5.4.11
 - **Gradle**: 9.5.1 (с поддержкой wasmJs)
 - **Ktor Client**: 3.5.0 (с поддержкой wasmJs)

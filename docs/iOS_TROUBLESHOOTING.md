@@ -6,7 +6,7 @@ This document addresses known issues, common compilation errors, and setup probl
 
 ✅ **iOS support is fully implemented and building successfully.**
 
-With the upgrade to **Kotlin 2.4.0**, **Compose Multiplatform 1.11.1**, and **Gradle 9.x / Java 25**, the previous build configuration issues (such as `DefaultArtifactPublicationSet` ClassNotFoundException) have been fully resolved. 
+With the upgrade to **Kotlin 2.4.20**, **Compose Multiplatform 1.12.0**, and **Gradle 9.x / Java 25**, the previous build configuration issues (such as `DefaultArtifactPublicationSet` ClassNotFoundException) have been fully resolved. 
 
 The iOS targets (`iosArm64`, `iosSimulatorArm64`) compile and link successfully:
 ```bash

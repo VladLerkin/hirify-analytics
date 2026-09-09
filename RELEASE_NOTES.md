@@ -1,5 +1,9 @@
 # Hirify Analytics Release Notes
 
+## v1.0.24 (September 2026)
+* **Code Maintenance:** Reorganized utility scripts into a dedicated `scripts/` directory for better project structure.
+* **Documentation:** Updated AI workflows and application documentation to reflect the new script locations.
+
 ## v1.0.23 (August 2026)
 * **Build Fixes:** Downgraded Gradle wrapper to version `9.6.1` and fixed a version conflict with the Compose Multiplatform plugin (`1.11.1`).
 
