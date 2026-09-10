@@ -1,7 +1,10 @@
 package hirify.analytics.ui.render
 
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.useContents
 import platform.Foundation.*
 
+@OptIn(ExperimentalForeignApi::class)
 actual fun getCurrentDateInfo(): DateInfo {
     val date = NSDate()
     val calendar = NSCalendar.currentCalendar
@@ -10,5 +13,5 @@ actual fun getCurrentDateInfo(): DateInfo {
     val month = components.month.toInt()
     val day = components.day.toInt()
     val range = calendar.rangeOfUnit(NSCalendarUnitDay, inUnit = NSCalendarUnitMonth, forDate = date)
-    return DateInfo(year, month, day, range.length.toInt())
+    return DateInfo(year, month, day, range.useContents { length.toInt() })
 }

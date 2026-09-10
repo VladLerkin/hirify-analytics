@@ -1,5 +1,8 @@
 # Hirify Analytics Release Notes
 
+## v1.0.27 (September 2026)
+* **iOS Build Fix:** Fixed an iOS native compilation issue in `DateUtils` related to C-Interop memory access by correctly using `useContents` for C-structs.
+
 ## v1.0.26 (September 2026)
 * **Chart Data Extrapolation:** Implemented extrapolation for the current month's incomplete data based on the number of days passed, preventing the chart from falsely dipping at the end.
 * **UI Improvements:** The extrapolated segment of the chart is now visually distinguished with a dashed line to indicate forecasted data.
