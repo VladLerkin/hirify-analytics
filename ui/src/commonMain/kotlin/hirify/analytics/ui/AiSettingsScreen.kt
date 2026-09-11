@@ -350,6 +350,11 @@ class AiSettingsScreen : Screen {
                                         modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp)
                                     )
                                     Text("${(downloadProgress * 100).toInt()}% downloaded", style = MaterialTheme.typography.bodySmall)
+                                } else if (downloadProgress > 1f) {
+                                    LinearProgressIndicator(
+                                        modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp)
+                                    )
+                                    Text("Extracting model (this may take a couple of minutes)...", style = MaterialTheme.typography.bodySmall)
                                 } else {
                                     Button(onClick = {
                                         scope.launch {

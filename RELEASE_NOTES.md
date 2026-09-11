@@ -1,5 +1,9 @@
 # Hirify Analytics Release Notes
 
+## v1.0.29 (September 2026)
+* **Bug Fix:** Fixed an issue where Sherpa-ONNX model download interruptions would leave a corrupted model and silently fail.
+* **Performance:** Replaced slow Java-based bzip2 compression with native `tar` extraction, significantly reducing model extraction time.
+
 ## v1.0.28 (September 2026)
 * **Speech Recognition:** Migrated offline voice recognition engine from Vosk to Sherpa-ONNX for improved accuracy and stability.
 * **Dependency Updates:** Updated Android Compose BOM to `2026.09.00` and Android Gradle Plugin to `9.4.0`.
