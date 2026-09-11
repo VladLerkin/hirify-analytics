@@ -1,5 +1,8 @@
 # Hirify Analytics Release Notes
 
+## v1.0.30 (September 2026)
+* **Bug Fix:** Fixed an Android release build crash by adding Proguard keep rules for Sherpa-ONNX JNI reflection.
+
 ## v1.0.29 (September 2026)
 * **Bug Fix:** Fixed an issue where Sherpa-ONNX model download interruptions would leave a corrupted model and silently fail.
 * **Performance:** Replaced slow Java-based bzip2 compression with native `tar` extraction, significantly reducing model extraction time.
