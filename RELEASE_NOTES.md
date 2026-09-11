@@ -1,5 +1,9 @@
 # Hirify Analytics Release Notes
 
+## v1.0.31 (September 2026)
+* **Bug Fix:** Fixed an issue where Sherpa-ONNX offline recognition threw a ClassNotFoundException on Android by ensuring the dependency is properly packaged in the APK.
+* **Bug Fix:** Fixed the voice model testing in the AI Config Dialog by supplying proper default models for STT connection testing.
+
 ## v1.0.30 (September 2026)
 * **Bug Fix:** Fixed an Android release build crash by adding Proguard keep rules for Sherpa-ONNX JNI reflection.
 
