@@ -141,7 +141,8 @@ actual class SherpaRecognizerManager actual constructor() {
             }
         } catch (e: Exception) {
             // Fallback to slow Java extraction if native tar fails or is not available
-            val bzIn = BZip2CompressorInputStream(tarFile.inputStream())
+            val bufferedIn = tarFile.inputStream().buffered(65536)
+            val bzIn = BZip2CompressorInputStream(bufferedIn)
             val tarIn = TarArchiveInputStream(bzIn)
             var entry = tarIn.nextTarEntry
             while (entry != null) {
@@ -150,7 +151,7 @@ actual class SherpaRecognizerManager actual constructor() {
                     newFile.mkdirs()
                 } else {
                     newFile.parentFile?.mkdirs()
-                    FileOutputStream(newFile).use { fos ->
+                    newFile.outputStream().buffered(65536).use { fos ->
                         tarIn.copyTo(fos)
                     }
                 }

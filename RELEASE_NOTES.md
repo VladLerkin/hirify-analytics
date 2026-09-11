@@ -1,5 +1,8 @@
 # Hirify Analytics Release Notes
 
+## v1.0.34 (September 2026)
+* **Performance:** Sped up Sherpa-ONNX model extraction on older Windows systems by adding stream buffering to the Java fallback extractor.
+
 ## v1.0.33 (September 2026)
 * **Feature:** Added an explicit "Exit" button in the application UI for easier quitting on Android and Desktop.
 * **Feature:** Added a "Delete Model" button to the AI Settings screen for managing downloaded Sherpa-ONNX models.
