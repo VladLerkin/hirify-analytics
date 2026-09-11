@@ -1,5 +1,8 @@
 # Hirify Analytics Release Notes
 
+## v1.0.35 (September 2026)
+* **Bug Fix:** Fixed an issue where the desktop application's UI would freeze (deadlock) when stopping or cancelling voice recording.
+
 ## v1.0.34 (September 2026)
 * **Performance:** Sped up Sherpa-ONNX model extraction on older Windows systems by adding stream buffering to the Java fallback extractor.
 
