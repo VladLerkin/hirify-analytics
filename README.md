@@ -11,7 +11,7 @@
 - 📊 **Interactive Analytics Dashboards** - Visualize real-time job market data and HR metrics.
 - 📈 **Multiple Chart Series** - Compare up to 5 different job market queries simultaneously (Google Trends style).
 - 🔍 **Vacancy Filtering** - Deep dive into specializations, skills, formats, and regions.
-- 🎤 **Voice Input (AI)** - Use offline (Vosk) or cloud (Whisper, Google, Yandex) speech recognition to enter filters by voice.
+- 🎤 **Voice Input (AI)** - Use offline (Sherpa-ONNX) or cloud (Whisper, Google, Yandex) speech recognition to enter filters by voice.
 - 🎨 **Modern UI** - Built with Compose Multiplatform for a native look and feel on every platform.
 - ⚡️ **High Performance** - Native compilation guarantees fast processing of massive analytics datasets.
 - 🌐 **Cross-Platform** - Available on Desktop, Web, Android, and iOS.
@@ -87,9 +87,9 @@ The project uses **Gradle Version Catalog** for centralized dependency managemen
 |-----------|---------|
 | Kotlin | 2.4.20 |
 | Compose Multiplatform | 1.12.0 |
-| Android Compose BOM | 2026.08.00 |
+| Android Compose BOM | 2026.09.00 |
 | Gradle | 9.6.1 |
-| Android Gradle Plugin | 9.3.1 |
+| Android Gradle Plugin | 9.4.0 |
 | Ktor | 3.5.2 |
 | JDK | 25 |
 

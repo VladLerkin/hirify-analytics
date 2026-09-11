@@ -1,5 +1,10 @@
 # Hirify Analytics Release Notes
 
+## v1.0.28 (September 2026)
+* **Speech Recognition:** Migrated offline voice recognition engine from Vosk to Sherpa-ONNX for improved accuracy and stability.
+* **Dependency Updates:** Updated Android Compose BOM to `2026.09.00` and Android Gradle Plugin to `9.4.0`.
+* **Agent Skills:** Updated the `check-updates` skill to automatically maintain dependency versions in the README.
+
 ## v1.0.27 (September 2026)
 * **iOS Build Fix:** Fixed an iOS native compilation issue in `DateUtils` related to C-Interop memory access by correctly using `useContents` for C-structs.
 

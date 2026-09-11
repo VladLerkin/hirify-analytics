@@ -291,7 +291,7 @@ class AiSettingsScreen : Screen {
                     var transcriptionExpanded by remember { mutableStateOf(false) }
                     val transcriptionProviders = listOf(
                         "OPENAI_WHISPER" to strings.openaiWhisperProvider,
-                        "VOSK_LOCAL" to strings.voskLocalProvider,
+                        "SHERPA_LOCAL" to strings.sherpaLocalProvider,
                         "GOOGLE_SPEECH" to strings.googleSpeechProvider,
                         "YANDEX_SPEECHKIT" to strings.yandexSpeechKitProvider
                     )
@@ -321,11 +321,11 @@ class AiSettingsScreen : Screen {
                     }
                     
                     // Vosk Download Manager
-                    if (transcriptionProvider == "VOSK_LOCAL") {
+                    if (transcriptionProvider == "SHERPA_LOCAL") {
                         val scope = rememberCoroutineScope()
-                        val voskManager = remember { hirify.analytics.core.ai.VoskRecognizerManager() }
+                        val sherpaManager = remember { hirify.analytics.core.ai.SherpaRecognizerManager() }
                         val currentLang = if (language.isBlank()) "ru" else language
-                        var isDownloaded by remember(currentLang) { mutableStateOf(voskManager.isModelDownloaded(currentLang)) }
+                        var isDownloaded by remember(currentLang) { mutableStateOf(sherpaManager.isModelDownloaded(currentLang)) }
                         var downloadProgress by remember { mutableStateOf(-1f) }
                         var downloadError by remember { mutableStateOf<String?>(null) }
                         
@@ -338,7 +338,7 @@ class AiSettingsScreen : Screen {
                         } else {
                             Column(modifier = Modifier.padding(vertical = 8.dp)) {
                                 Text(
-                                    text = strings.voskRequiresModel,
+                                    text = strings.sherpaRequiresModel,
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.padding(bottom = 8.dp)
@@ -356,7 +356,7 @@ class AiSettingsScreen : Screen {
                                             try {
                                                 downloadProgress = 0f
                                                 downloadError = null
-                                                voskManager.downloadModel(currentLang) { progress ->
+                                                sherpaManager.downloadModel(currentLang) { progress ->
                                                     downloadProgress = progress
                                                 }
                                                 isDownloaded = true

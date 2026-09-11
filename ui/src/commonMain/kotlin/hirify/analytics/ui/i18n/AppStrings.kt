@@ -117,7 +117,7 @@ interface AppStrings {
     val transcriptionLanguageSupportingText: String
     val speechRecognitionProviderLabel: String
     val selectProvider: String
-    val voskRequiresModel: String
+    val sherpaRequiresModel: String
     val downloadModel: String
     val modelDownloaded: String
     val error: String
@@ -135,7 +135,7 @@ interface AppStrings {
     val openaiWhisperApiKeyLabel: String
     val openaiWhisperApiKeySupportingText: String
     val openaiWhisperProvider: String
-    val voskLocalProvider: String
+    val sherpaLocalProvider: String
     val googleApiKeyLabel: String
     val googleSpeechApiKeyLabel: String
     val googleSpeechApiKeySupportingText: String
@@ -268,7 +268,7 @@ object EnStrings : AppStrings {
     override val transcriptionLanguageSupportingText = "Language code for transcription. Leave empty for auto-detection."
     override val speechRecognitionProviderLabel = "Speech Recognition Provider:"
     override val selectProvider = "Select Provider"
-    override val voskRequiresModel = "Vosk requires a ~45MB language model to be downloaded for offline use."
+    override val sherpaRequiresModel = "Sherpa-ONNX requires a ~150-200MB language model to be downloaded for offline use."
     override val downloadModel = "Download Model"
     override val modelDownloaded = "Model is downloaded and ready."
     override val error = "Error"
@@ -285,7 +285,7 @@ object EnStrings : AppStrings {
     override val openaiWhisperApiKeyLabel = "OpenAI API Key (Whisper)"
     override val openaiWhisperApiKeySupportingText = "API key for OpenAI Whisper transcription."
     override val openaiWhisperProvider = "OpenAI Whisper (Recommended)"
-    override val voskLocalProvider = "Vosk Local (Offline & Free)"
+    override val sherpaLocalProvider = "Sherpa-ONNX Local (Offline & Free)"
     override val googleApiKeyLabel = "Google AI API Key"
     override val googleSpeechApiKeyLabel = "Google AI API Key (Speech-to-Text)"
     override val googleSpeechApiKeySupportingText = "API key for Google Speech-to-Text."
@@ -417,7 +417,7 @@ object RuStrings : AppStrings {
     override val transcriptionLanguageSupportingText = "Код языка для распознавания речи. Оставьте пустым для автоопределения."
     override val speechRecognitionProviderLabel = "Провайдер распознавания речи:"
     override val selectProvider = "Выберите провайдера"
-    override val voskRequiresModel = "Vosk требует загрузки языковой модели (~45 МБ) для работы офлайн."
+    override val sherpaRequiresModel = "Sherpa-ONNX требует загрузки языковой модели (~150-200 МБ) для работы офлайн."
     override val downloadModel = "Скачать модель"
     override val modelDownloaded = "Модель загружена и готова к работе."
     override val error = "Ошибка"
@@ -434,7 +434,7 @@ object RuStrings : AppStrings {
     override val openaiWhisperApiKeyLabel = "OpenAI API Ключ (Whisper)"
     override val openaiWhisperApiKeySupportingText = "Ключ API для OpenAI Whisper."
     override val openaiWhisperProvider = "OpenAI Whisper (Рекомендуется)"
-    override val voskLocalProvider = "Vosk Local (Офлайн и бесплатно)"
+    override val sherpaLocalProvider = "Sherpa-ONNX Local (Офлайн и бесплатно)"
     override val googleApiKeyLabel = "Google AI API Ключ"
     override val googleSpeechApiKeyLabel = "Google AI API Ключ (Speech-to-Text)"
     override val googleSpeechApiKeySupportingText = "Ключ API для Google Speech-to-Text."

@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import hirify.analytics.core.ai.AiConfig
 import hirify.analytics.core.ai.AiPresets
-import hirify.analytics.core.ai.VoskRecognizerManager
+import hirify.analytics.core.ai.SherpaRecognizerManager
 import hirify.analytics.core.ai.AiClientFactory
 import hirify.analytics.core.ai.sendPromptSafe
 import hirify.analytics.core.ai.AiResult
@@ -350,7 +350,7 @@ fun AiConfigDialog(
                         var transcriptionExpanded by remember { mutableStateOf(false) }
                         val transcriptionProviders = listOf(
                             "OPENAI_WHISPER" to strings.openaiWhisperProvider,
-                            "VOSK_LOCAL" to strings.voskLocalProvider,
+                            "SHERPA_LOCAL" to strings.sherpaLocalProvider,
                             "GOOGLE_SPEECH" to strings.googleSpeechProvider,
                             "YANDEX_SPEECHKIT" to strings.yandexSpeechKitProvider
                         )
@@ -423,11 +423,11 @@ fun AiConfigDialog(
                         }
                         
                         // Vosk Download Manager
-                        if (transcriptionProvider == "VOSK_LOCAL") {
+                        if (transcriptionProvider == "SHERPA_LOCAL") {
                             val scope = rememberCoroutineScope()
-                            val voskManager = remember { VoskRecognizerManager() }
+                            val sherpaManager = remember { SherpaRecognizerManager() }
                             val currentLang = if (language.isBlank()) "ru" else language
-                            var isDownloaded by remember(currentLang) { mutableStateOf(voskManager.isModelDownloaded(currentLang)) }
+                            var isDownloaded by remember(currentLang) { mutableStateOf(sherpaManager.isModelDownloaded(currentLang)) }
                             var downloadProgress by remember { mutableStateOf(-1f) }
                             var downloadError by remember { mutableStateOf<String?>(null) }
                             
@@ -440,7 +440,7 @@ fun AiConfigDialog(
                             } else {
                                 Column(modifier = Modifier.padding(vertical = 8.dp)) {
                                     Text(
-                                        text = strings.voskRequiresModel,
+                                        text = strings.sherpaRequiresModel,
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.padding(bottom = 8.dp)
@@ -458,7 +458,7 @@ fun AiConfigDialog(
                                                 try {
                                                     downloadProgress = 0f
                                                     downloadError = null
-                                                    voskManager.downloadModel(currentLang) { progress ->
+                                                    sherpaManager.downloadModel(currentLang) { progress ->
                                                         downloadProgress = progress
                                                     }
                                                     isDownloaded = true

@@ -62,6 +62,7 @@ kotlin {
 
                 implementation(libs.llamatik)
                 api(libs.koin.core)
+                implementation(libs.commons.compress)
 
             }
         }
@@ -72,14 +73,14 @@ kotlin {
 
             api(libs.koin.android)
 
-            implementation(libs.vosk.android)
+            compileOnly(files("../libs/sherpa-onnx/sherpa-onnx-1.13.8.aar"))
         }
         
         val desktopMain by getting {
             dependencies {
                 implementation(libs.ktor.client.cio)
 
-                implementation(libs.vosk.jvm)
+                implementation(files("../libs/sherpa-onnx/sherpa-onnx-jvm-1.13.8.jar"))
                 implementation(libs.jna)
             }
         }

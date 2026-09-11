@@ -10,3 +10,4 @@ description: Check for dependency updates and update stable versions across grad
 5. First, update the corresponding version in `gradle/libs.versions.toml`.
 6. **CRITICAL**: You must ALSO update the versions in `settings.gradle.kts` if the updated dependency is a plugin defined there. For example, if `kotlin`, `compose`, `agp`, `serialization`, or `foojay-resolver` is updated, you MUST replace their version strings in the `plugins { ... }` block of `settings.gradle.kts` so that they match the versions in the TOML file.
 7. Build the project to verify that the dependency updates did not break the build.
+8. Finally, update the `README.md` to document which dependency versions were updated (e.g. in the Tech Stack & Dependencies table).
