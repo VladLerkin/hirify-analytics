@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.OpenInBrowser
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.ui.platform.LocalUriHandler
 import hirify.analytics.ui.components.panels.LeftSidebar
 import hirify.analytics.ui.render.ChartRenderer
@@ -46,6 +47,11 @@ fun MainScreen() {
 
     var isSidebarVisible by remember { mutableStateOf(true) }
     var showMenu by remember { mutableStateOf(false) }
+    var exitRequested by remember { mutableStateOf(false) }
+
+    if (exitRequested) {
+        ExitAppAction(onExit = { exitRequested = false })
+    }
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val isPortrait = maxHeight > maxWidth
@@ -99,6 +105,9 @@ fun MainScreen() {
                             IconButton(onClick = { navigator.push(AiSettingsScreen()) }) {
                                 Icon(androidx.compose.material.icons.Icons.Filled.Settings, contentDescription = strings.settings)
                             }
+                            IconButton(onClick = { exitRequested = true }) {
+                                Icon(Icons.Filled.ExitToApp, contentDescription = strings.exit)
+                            }
                         } else {
                             Box {
                                 IconButton(onClick = { showMenu = true }) {
@@ -131,6 +140,14 @@ fun MainScreen() {
                                             navigator.push(AiSettingsScreen()) 
                                         },
                                         leadingIcon = { Icon(androidx.compose.material.icons.Icons.Filled.Settings, contentDescription = null) }
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text(strings.exit) },
+                                        onClick = { 
+                                            showMenu = false
+                                            exitRequested = true 
+                                        },
+                                        leadingIcon = { Icon(Icons.Filled.ExitToApp, contentDescription = null) }
                                     )
                                 }
                             }

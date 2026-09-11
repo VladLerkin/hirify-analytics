@@ -119,6 +119,8 @@ interface AppStrings {
     val selectProvider: String
     val sherpaRequiresModel: String
     val downloadModel: String
+    val deleteModel: String
+    val exit: String
     val modelDownloaded: String
     val error: String
     val advancedSettings: String
@@ -270,6 +272,8 @@ object EnStrings : AppStrings {
     override val selectProvider = "Select Provider"
     override val sherpaRequiresModel = "Sherpa-ONNX requires a ~150-200MB language model to be downloaded for offline use."
     override val downloadModel = "Download Model"
+    override val deleteModel = "Delete Model"
+    override val exit = "Exit"
     override val modelDownloaded = "Model is downloaded and ready."
     override val error = "Error"
     override val advancedSettings = "Advanced Settings:"
@@ -419,6 +423,8 @@ object RuStrings : AppStrings {
     override val selectProvider = "Выберите провайдера"
     override val sherpaRequiresModel = "Sherpa-ONNX требует загрузки языковой модели (~150-200 МБ) для работы офлайн."
     override val downloadModel = "Скачать модель"
+    override val deleteModel = "Удалить модель"
+    override val exit = "Выход"
     override val modelDownloaded = "Модель загружена и готова к работе."
     override val error = "Ошибка"
     override val advancedSettings = "Дополнительные настройки:"

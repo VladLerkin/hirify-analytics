@@ -1,5 +1,10 @@
 # Hirify Analytics Release Notes
 
+## v1.0.33 (September 2026)
+* **Feature:** Added an explicit "Exit" button in the application UI for easier quitting on Android and Desktop.
+* **Feature:** Added a "Delete Model" button to the AI Settings screen for managing downloaded Sherpa-ONNX models.
+* **Bug Fix:** Enhanced STT connection testing to correctly evaluate the Sherpa-ONNX offline model state alongside cloud STT providers.
+* **Agent Skills:** Added the `android-debug-launch` skill to ensure correct ADB launching of debug builds.
 ## v1.0.32 (September 2026)
 * **Bug Fix:** Fixed an issue where the STT recording format was hardcoded to `.m4a`, causing Sherpa-ONNX offline speech recognition to fail because it expects `.wav` format.
 

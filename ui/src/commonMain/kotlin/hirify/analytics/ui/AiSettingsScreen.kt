@@ -330,11 +330,22 @@ class AiSettingsScreen : Screen {
                         var downloadError by remember { mutableStateOf<String?>(null) }
                         
                         if (isDownloaded) {
-                            Text(
-                                text = "✓ ${strings.modelDownloaded}",
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.padding(vertical = 8.dp)
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = "✓ ${strings.modelDownloaded}",
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                TextButton(onClick = {
+                                    sherpaManager.deleteModel(currentLang)
+                                    isDownloaded = false
+                                }) {
+                                    Text(strings.deleteModel, color = MaterialTheme.colorScheme.error)
+                                }
+                            }
                         } else {
                             Column(modifier = Modifier.padding(vertical = 8.dp)) {
                                 Text(
@@ -496,18 +507,54 @@ class AiSettingsScreen : Screen {
                                         interfaceLanguage = interfaceLanguage
                                     )
                                     val client = aiClientFactory.createClient(currentConfig)
-                                    val result = client.sendPromptSafe("Hello, are you there?", currentConfig)
+                                    val llmResult = client.sendPromptSafe("Hello, are you there?", currentConfig)
                                     
-                                    when (result) {
-                                        is AiResult.Success -> {
-                                            testConnectionSuccess = true
-                                            testConnectionResult = "${strings.connectionSuccessful}\nResponse: ${result.text.take(100)}"
+                                    val llmMessage = when (llmResult) {
+                                        is AiResult.Success -> "LLM ($provider): ${strings.connectionSuccessful}"
+                                        is AiResult.Error -> "LLM ($provider): ${strings.connectionFailed} - ${llmResult.message}"
+                                    }
+                                    val llmSuccess = llmResult is AiResult.Success
+
+                                    var sttMessage = "STT ($transcriptionProvider): Ready (Offline)"
+                                    var sttSuccess = true
+
+                                    val sttEquivalentProvider = when (transcriptionProvider) {
+                                        "OPENAI_WHISPER" -> "OPENAI"
+                                        "GOOGLE_SPEECH" -> "GOOGLE"
+                                        "YANDEX_SPEECHKIT" -> "YANDEX"
+                                        else -> null
+                                    }
+                                    
+                                    if (sttEquivalentProvider != null) {
+                                        val defaultModelForStt = when (sttEquivalentProvider) {
+                                            "GOOGLE" -> "gemini-2.5-flash"
+                                            "OPENAI" -> "gpt-4o-mini"
+                                            "YANDEX" -> "yandexgpt-lite"
+                                            else -> currentConfig.model
                                         }
-                                        is AiResult.Error -> {
-                                            testConnectionSuccess = false
-                                            testConnectionResult = "${strings.connectionFailed}:\n${result.message}"
+                                        val sttConfig = currentConfig.copy(
+                                            provider = sttEquivalentProvider,
+                                            model = defaultModelForStt
+                                        )
+                                        val sttClient = aiClientFactory.createClient(sttConfig)
+                                        val sttResult = sttClient.sendPromptSafe("Hello?", sttConfig)
+                                        
+                                        sttMessage = when (sttResult) {
+                                            is AiResult.Success -> "STT ($transcriptionProvider): ${strings.connectionSuccessful}"
+                                            is AiResult.Error -> "STT ($transcriptionProvider): ${strings.connectionFailed} - ${sttResult.message}"
+                                        }
+                                        sttSuccess = sttResult is AiResult.Success
+                                    } else if (transcriptionProvider == "SHERPA_LOCAL") {
+                                        val sherpaManager = hirify.analytics.core.ai.SherpaRecognizerManager()
+                                        val currentLang = if (language.isBlank()) "ru" else language
+                                        if (!sherpaManager.isModelDownloaded(currentLang)) {
+                                            sttMessage = "STT (SHERPA_LOCAL): Model not fully downloaded/extracted yet"
+                                            sttSuccess = false
                                         }
                                     }
+                                    
+                                    testConnectionSuccess = llmSuccess && sttSuccess
+                                    testConnectionResult = "$llmMessage\n$sttMessage"
                                 } catch (e: Exception) {
                                     testConnectionSuccess = false
                                     testConnectionResult = "${strings.error}: ${e.message}"

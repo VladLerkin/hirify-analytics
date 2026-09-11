@@ -44,6 +44,13 @@ actual class SherpaRecognizerManager actual constructor() {
         return modelPath.exists() && modelPath.isDirectory && successFile.exists()
     }
 
+    actual fun deleteModel(language: String) {
+        val finalDir = File(modelsDir, getModelDirName(language))
+        if (finalDir.exists()) {
+            finalDir.deleteRecursively()
+        }
+    }
+
     actual suspend fun downloadModel(language: String, onProgress: (Float) -> Unit): String = withContext(Dispatchers.IO) {
         if (!modelsDir.exists()) {
             modelsDir.mkdirs()
