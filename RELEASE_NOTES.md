@@ -1,5 +1,9 @@
 # Hirify Analytics Release Notes
 
+## v1.0.32 (September 2026)
+* **Bug Fix:** Fixed an issue where the STT recording format was hardcoded to `.m4a`, causing Sherpa-ONNX offline speech recognition to fail because it expects `.wav` format.
+
+
 ## v1.0.31 (September 2026)
 * **Bug Fix:** Fixed an issue where Sherpa-ONNX offline recognition threw a ClassNotFoundException on Android by ensuring the dependency is properly packaged in the APK.
 * **Bug Fix:** Fixed the voice model testing in the AI Config Dialog by supplying proper default models for STT connection testing.

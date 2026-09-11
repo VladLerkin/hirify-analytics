@@ -44,7 +44,15 @@ class VoiceInputProcessor(
     private fun startRecording() {
         errorMessage.value = null
         try {
+            val config = settingsStorage.loadConfig()
+            val audioFormat = when (config.transcriptionProvider) {
+                "YANDEX_SPEECHKIT", "SHERPA_LOCAL" -> hirify.analytics.core.platform.AudioFormat.WAV
+                "GOOGLE_SPEECH" -> hirify.analytics.core.platform.AudioFormat.FLAC
+                else -> hirify.analytics.core.platform.AudioFormat.M4A
+            }
+            
             voiceRecorder.startRecording(
+                format = audioFormat,
                 onResult = { audioData ->
                     isRecording.value = false
                     autoStopJob?.cancel()
