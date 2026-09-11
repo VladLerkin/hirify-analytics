@@ -80,6 +80,8 @@ class VoiceInputProcessor(
 
     private fun stopRecording() {
         autoStopJob?.cancel()
+        isRecording.value = false
+        isProcessing.value = true
         voiceRecorder.stopRecording()
     }
 
@@ -88,7 +90,9 @@ class VoiceInputProcessor(
         coroutineScope.launch {
             try {
                 val config = settingsStorage.loadConfig()
-                val client = transcriptionClientFactory.createClient(config)
+                val client = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
+                    transcriptionClientFactory.createClient(config)
+                }
                 val transcript = client.transcribeAudio(audioData, config)
                 
                 if (transcript.isNotBlank()) {

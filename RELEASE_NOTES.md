@@ -1,5 +1,8 @@
 # Hirify Analytics Release Notes
 
+## v1.0.36 (September 2026)
+* **Bug Fix:** Fixed a UI freeze issue on older machines when pressing "Stop Recording". The heavy initialization of the Sherpa-ONNX model has been moved to a background thread to prevent blocking the UI.
+
 ## v1.0.35 (September 2026)
 * **Bug Fix:** Fixed an issue where the desktop application's UI would freeze (deadlock) when stopping or cancelling voice recording.
 
