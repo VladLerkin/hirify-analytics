@@ -41,7 +41,6 @@ fun AiConfigDialog(
     onConfirm: (AiConfig) -> Unit
 ) {
     val aiClientFactory = org.koin.compose.koinInject<AiClientFactory>()
-    val strings = hirify.analytics.ui.i18n.LocalAppStrings.current
     val presets = AiPresets.getAllPresets()
     
     // Find the preset index that matches initialConfig.model
@@ -67,10 +66,6 @@ fun AiConfigDialog(
     var googleKey by remember { mutableStateOf(initialConfig.googleAiApiKey) }
     var yandexKey by remember { mutableStateOf(initialConfig.yandexApiKey) }
     var yandexFolderId by remember { mutableStateOf(initialConfig.yandexFolderId) }
-    var tavilyApiKey by remember { mutableStateOf(initialConfig.tavilyApiKey) }
-    var autoresearchRepoPath by remember { mutableStateOf(initialConfig.autoresearchRepoPath) }
-    var pamyatNarodaCookies by remember { mutableStateOf(initialConfig.pamyatNarodaCookies) }
-    var familySearchCookies by remember { mutableStateOf(initialConfig.familySearchCookies) }
     
     Dialog(onDismissRequest = onDismiss) {
         Surface(
@@ -84,16 +79,17 @@ fun AiConfigDialog(
                 modifier = Modifier
                     .padding(24.dp)
             ) {
+                
                 Column(
                     modifier = Modifier
-                        .weight(1f)
+                        .weight(1f, fill = false)
                         .verticalScroll(rememberScrollState())
                 ) {
                         // Preset selector
                         var presetsExpanded by remember { mutableStateOf(false) }
                         
                         Text(
-                            text = strings.presetsLabel,
+                            text = "Presets:",
                             style = MaterialTheme.typography.labelLarge,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
@@ -103,7 +99,7 @@ fun AiConfigDialog(
                                 onClick = { presetsExpanded = true },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Text(presets.getOrNull(selectedPresetIndex)?.first ?: strings.selectPreset)
+                                Text(presets.getOrNull(selectedPresetIndex)?.first ?: "Select Preset")
                             }
                             DropdownMenu(
                                 expanded = presetsExpanded,
@@ -135,9 +131,9 @@ fun AiConfigDialog(
                                 ApiKeyTextField(
                                     value = openAiKey,
                                     onValueChange = { openAiKey = it },
-                                    label = strings.openaiApiKeyLabel,
+                                    label = "OpenAI API Key",
                                     placeholder = "sk-...",
-                                    supportingText = strings.keyStoredInMemory,
+                                    supportingText = "Provided key is stored in memory and masked in logs.",
                                     modifier = Modifier.fillMaxWidth()
                                 )
                             }
@@ -146,9 +142,9 @@ fun AiConfigDialog(
                                 ApiKeyTextField(
                                     value = googleKey,
                                     onValueChange = { googleKey = it },
-                                    label = strings.googleApiKeyLabel,
+                                    label = "Google AI API Key",
                                     placeholder = "AIza...",
-                                    supportingText = strings.keyStoredInMemory,
+                                    supportingText = "Provided key is stored in memory and masked in logs.",
                                     modifier = Modifier.fillMaxWidth()
                                 )
                             }
@@ -156,17 +152,17 @@ fun AiConfigDialog(
                                 ApiKeyTextField(
                                     value = yandexKey,
                                     onValueChange = { yandexKey = it },
-                                    label = strings.yandexApiKeyLabel,
+                                    label = "YandexGPT API Key",
                                     placeholder = "AQVN...",
-                                    supportingText = strings.keyStoredInMemory,
+                                    supportingText = "Provided key is stored in memory and masked in logs.",
                                     modifier = Modifier.fillMaxWidth()
                                 )
                                 OutlinedTextField(
                                     value = yandexFolderId,
                                     onValueChange = { yandexFolderId = it },
-                                    label = { Text(strings.yandexFolderIdLabel) },
+                                    label = { Text("Folder ID (optional)") },
                                     placeholder = { Text("default or b1g...") },
-                                    supportingText = { Text(strings.yandexFolderIdSupportingText) },
+                                    supportingText = { Text("Yandex Cloud Folder ID. Leave as 'default' for automatic detection when using a service account API key.") },
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(bottom = 12.dp),
@@ -178,7 +174,7 @@ fun AiConfigDialog(
                                 val localModelManager = org.koin.compose.koinInject<hirify.analytics.core.ai.LocalModelManager>()
                                 var downloadProgress by remember { mutableStateOf(-1f) }
                                 var downloadError by remember { mutableStateOf<String?>(null) }
-                                var isDownloaded by remember { mutableStateOf(false) }
+                                var isDownloaded by remember(model) { mutableStateOf(localModelManager.isModelDownloaded(model)) }
                                 
                                 Column(modifier = Modifier.padding(bottom = 12.dp)) {
                                     Text(
@@ -189,17 +185,29 @@ fun AiConfigDialog(
                                     )
                                     
                                     if (isDownloaded) {
-                                        Text(
-                                            text = "✓ Model is downloaded or ready.",
-                                            color = MaterialTheme.colorScheme.primary,
-                                            modifier = Modifier.padding(vertical = 8.dp)
-                                        )
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth()
+                                        ) {
+                                            Text(
+                                                text = "✓ Model '$model' is downloaded and ready.",
+                                                color = MaterialTheme.colorScheme.primary,
+                                                modifier = Modifier.weight(1f)
+                                            )
+                                            TextButton(onClick = {
+                                                localModelManager.deleteModel(model)
+                                                isDownloaded = false
+                                            }) {
+                                                Text("Delete Model", color = MaterialTheme.colorScheme.error)
+                                            }
+                                        }
                                     } else if (downloadProgress >= 0f && downloadProgress <= 1f) {
                                         LinearProgressIndicator(
                                             progress = { downloadProgress },
                                             modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp)
                                         )
-                                        Text("${(downloadProgress * 100).toInt()}% downloaded", style = MaterialTheme.typography.bodySmall)
+                                        val p = (downloadProgress * 100).toInt()
+                                        Text("Downloading: $p%", style = MaterialTheme.typography.bodySmall)
                                     } else {
                                         Button(onClick = {
                                             scope.launch {
@@ -246,7 +254,7 @@ fun AiConfigDialog(
                                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 12.dp)) {
                                     val ollamaCommand = "ollama run ${if (model.isNotBlank()) model else "qwen2.5:7b"}"
                                     Text(
-                                        text = strings.apiKeyNotRequired + ollamaCommand,
+                                        text = "API key is not required for local models\nTo download the selected model run: $ollamaCommand",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.weight(1f)
@@ -266,7 +274,7 @@ fun AiConfigDialog(
                             OutlinedTextField(
                                 value = baseUrl,
                                 onValueChange = { baseUrl = it },
-                                label = { Text(strings.baseUrlLabel) },
+                                label = { Text("Base URL") },
                                 placeholder = { 
                                     Text(
                                         when (provider) {
@@ -283,64 +291,24 @@ fun AiConfigDialog(
                         }
                         
                         // Model
-                        var modelExpanded by remember { mutableStateOf(false) }
-                        val predefinedModels = when (provider) {
-                            "OPENAI" -> listOf("gpt-4o-mini", "gpt-4o", "gpt-4-turbo", "o1-mini", "o1")
-                            "GOOGLE" -> listOf("gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-pro-exp")
-                            "YANDEX" -> listOf("yandexgpt-lite", "yandexgpt", "yandexgpt-32k")
-                            else -> emptyList()
-                        }
-                        
-                        Text(
-                            text = "${strings.modelLabel}:",
-                            style = MaterialTheme.typography.labelLarge,
-                            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
+                        OutlinedTextField(
+                            value = model,
+                            onValueChange = { model = it },
+                            label = { Text("Model") },
+                            placeholder = { Text("gpt-4o-mini") },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 12.dp),
+                            singleLine = true
                         )
-                        
-                        if (predefinedModels.isNotEmpty()) {
-                            Box(modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
-                                OutlinedButton(
-                                    onClick = { modelExpanded = true },
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Text(if (model.isNotBlank()) model else "Select Model")
-                                }
-                                DropdownMenu(
-                                    expanded = modelExpanded,
-                                    onDismissRequest = { modelExpanded = false },
-                                    modifier = Modifier.fillMaxWidth(0.9f)
-                                ) {
-                                    predefinedModels.forEach { modelName ->
-                                        DropdownMenuItem(
-                                            text = { Text(modelName) },
-                                            onClick = {
-                                                model = modelName
-                                                modelExpanded = false
-                                            }
-                                        )
-                                    }
-                                }
-                            }
-                        } else {
-                            OutlinedTextField(
-                                value = model,
-                                onValueChange = { model = it },
-                                label = { Text(strings.modelLabel) },
-                                placeholder = { Text("Model name") },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 12.dp),
-                                singleLine = true
-                            )
-                        }
                         
                         // Language for voice transcription
                         OutlinedTextField(
                             value = language,
                             onValueChange = { language = it },
-                            label = { Text(strings.transcriptionLanguageLabel) },
+                            label = { Text("Transcription Language (ISO-639-1)") },
                             placeholder = { Text("ka, ru, en, etc.") },
-                            supportingText = { Text(strings.transcriptionLanguageSupportingText) },
+                            supportingText = { Text("Language code for transcription (e.g., 'ka' for Georgian, 'ru' for Russian). Leave empty for auto-detection.") },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(bottom = 12.dp),
@@ -349,15 +317,15 @@ fun AiConfigDialog(
                         
                         var transcriptionExpanded by remember { mutableStateOf(false) }
                         val transcriptionProviders = listOf(
-                            "OPENAI_WHISPER" to strings.openaiWhisperProvider,
-                            "SHERPA_LOCAL" to strings.sherpaLocalProvider,
-                            "GOOGLE_SPEECH" to strings.googleSpeechProvider,
-                            "YANDEX_SPEECHKIT" to strings.yandexSpeechKitProvider
+                            "OPENAI_WHISPER" to "OpenAI Whisper",
+                            "GOOGLE_SPEECH" to "Google Speech-to-Text (best for Georgian)",
+                            "YANDEX_SPEECHKIT" to "Yandex SpeechKit (best for Russian and CIS languages)",
+                            "SHERPA_LOCAL" to "Sherpa-ONNX Local (Offline & Free)"
                         )
                         
                         // Transcription provider selection
                         Text(
-                            text = strings.speechRecognitionProviderLabel,
+                            text = "Speech Recognition Provider:",
                             style = MaterialTheme.typography.labelLarge,
                             modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
                         )
@@ -367,7 +335,7 @@ fun AiConfigDialog(
                                 onClick = { transcriptionExpanded = true },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Text(transcriptionProviders.find { it.first == transcriptionProvider }?.second ?: strings.selectProvider)
+                                Text(transcriptionProviders.find { it.first == transcriptionProvider }?.second ?: "Select Provider")
                             }
                             DropdownMenu(
                                 expanded = transcriptionExpanded,
@@ -422,7 +390,7 @@ fun AiConfigDialog(
                             )
                         }
                         
-                        // Vosk Download Manager
+                        // Sherpa Download Manager
                         if (transcriptionProvider == "SHERPA_LOCAL") {
                             val scope = rememberCoroutineScope()
                             val sherpaManager = remember { SherpaRecognizerManager() }
@@ -432,15 +400,26 @@ fun AiConfigDialog(
                             var downloadError by remember { mutableStateOf<String?>(null) }
                             
                             if (isDownloaded) {
-                                Text(
-                                    text = "✓ ${strings.modelDownloaded}",
-                                    color = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.padding(vertical = 8.dp)
-                                )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = "✓ Model for '$currentLang' is downloaded and ready.",
+                                        color = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    TextButton(onClick = {
+                                        sherpaManager.deleteModel(currentLang)
+                                        isDownloaded = false
+                                    }) {
+                                        Text("Delete Model", color = MaterialTheme.colorScheme.error)
+                                    }
+                                }
                             } else {
                                 Column(modifier = Modifier.padding(vertical = 8.dp)) {
                                     Text(
-                                        text = strings.sherpaRequiresModel,
+                                        text = "Sherpa-ONNX requires a ~150-200MB language model to be downloaded for offline use.",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.padding(bottom = 8.dp)
@@ -451,12 +430,13 @@ fun AiConfigDialog(
                                             progress = { downloadProgress },
                                             modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp)
                                         )
-                                        Text("${(downloadProgress * 100).toInt()}% downloaded", style = MaterialTheme.typography.bodySmall)
+                                        val p = (downloadProgress * 100).toInt()
+                                        Text("Downloading: $p%", style = MaterialTheme.typography.bodySmall)
                                     } else if (downloadProgress > 1f) {
                                         LinearProgressIndicator(
                                             modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp)
                                         )
-                                        Text("Extracting model (this may take a couple of minutes)...", style = MaterialTheme.typography.bodySmall)
+                                        Text("Downloaded ✓ Extracting...", style = MaterialTheme.typography.bodySmall)
                                     } else {
                                         Button(onClick = {
                                             scope.launch {
@@ -492,7 +472,7 @@ fun AiConfigDialog(
                         
                         // Advanced settings
                         Text(
-                            text = strings.advancedSettings,
+                            text = "Advanced Settings:",
                             style = MaterialTheme.typography.labelLarge,
                             modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
                         )
@@ -504,7 +484,7 @@ fun AiConfigDialog(
                             OutlinedTextField(
                                 value = temperature,
                                 onValueChange = { temperature = it },
-                                label = { Text(strings.temperatureLabel) },
+                                label = { Text("Temperature") },
                                 placeholder = { Text("0.7") },
                                 modifier = Modifier.weight(1f),
                                 singleLine = true
@@ -513,7 +493,7 @@ fun AiConfigDialog(
                             OutlinedTextField(
                                 value = maxTokens,
                                 onValueChange = { maxTokens = it },
-                                label = { Text(strings.maxTokensLabel) },
+                                label = { Text("Max Tokens") },
                                 placeholder = { Text("4000") },
                                 modifier = Modifier.weight(1f),
                                 singleLine = true
@@ -567,11 +547,7 @@ fun AiConfigDialog(
                                     openaiApiKey = openAiKey,
                                     googleAiApiKey = googleKey,
                                     yandexApiKey = yandexKey,
-                                    yandexFolderId = yandexFolderId,
-                                    tavilyApiKey = tavilyApiKey,
-                                    autoresearchRepoPath = autoresearchRepoPath,
-                                    pamyatNarodaCookies = pamyatNarodaCookies,
-                                    familySearchCookies = familySearchCookies
+                                    yandexFolderId = yandexFolderId
                                 )
                                 val client = aiClientFactory.createClient(currentConfig)
                                 val llmResult = client.sendPromptSafe("Hello, are you there?", currentConfig)
@@ -612,6 +588,13 @@ fun AiConfigDialog(
                                         is AiResult.Error -> "STT ($transcriptionProvider): Failed - ${sttResult.message}"
                                     }
                                     sttSuccess = sttResult is AiResult.Success
+                                } else if (transcriptionProvider == "SHERPA_LOCAL") {
+                                    val sherpaManager = SherpaRecognizerManager()
+                                    val currentLang = if (language.isBlank()) "ru" else language
+                                    if (!sherpaManager.isModelDownloaded(currentLang)) {
+                                        sttMessage = "STT (SHERPA_LOCAL): Model not fully downloaded/extracted yet"
+                                        sttSuccess = false
+                                    }
                                 }
                                 
                                 testConnectionSuccess = llmSuccess && sttSuccess
@@ -657,7 +640,7 @@ fun AiConfigDialog(
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text(strings.cancel)
+                        Text("Cancel")
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(
@@ -679,16 +662,17 @@ fun AiConfigDialog(
                                 googleAiApiKey = googleKey,
                                 yandexApiKey = yandexKey,
                                 yandexFolderId = yandexFolderId,
-                                tavilyApiKey = tavilyApiKey,
-                                autoresearchRepoPath = autoresearchRepoPath,
-                                pamyatNarodaCookies = pamyatNarodaCookies,
-                                familySearchCookies = familySearchCookies
+                                tavilyApiKey = initialConfig.tavilyApiKey,
+                                autoresearchRepoPath = initialConfig.autoresearchRepoPath,
+                                pamyatNarodaCookies = initialConfig.pamyatNarodaCookies,
+                                familySearchCookies = initialConfig.familySearchCookies,
+                                hirifyApiKey = initialConfig.hirifyApiKey
                             )
                             onConfirm(config)
                         },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text(strings.confirm)
+                        Text("Confirm")
                     }
                 }
             }

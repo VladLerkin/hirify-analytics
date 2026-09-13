@@ -1,0 +1,96 @@
+--- AiConfigDialog.kt	2023-10-10 12:00:00.000000000 +0000
++++ AiConfigDialog_new.kt	2023-10-10 12:00:00.000000000 +0000
+@@ -69,11 +69,3 @@
+-    var tavilyApiKey by remember { mutableStateOf(initialConfig.tavilyApiKey) }
+-    var autoresearchRepoPath by remember { mutableStateOf(initialConfig.autoresearchRepoPath) }
+-    var pamyatNarodaCookies by remember { mutableStateOf(initialConfig.pamyatNarodaCookies) }
+-    var familySearchCookies by remember { mutableStateOf(initialConfig.familySearchCookies) }
+-    
+-    var selectedTabIndex by remember { mutableStateOf(0) }
+-    val tabs = listOf("Models & APIs", "Archives")
+-    
+     Dialog(onDismissRequest = onDismiss) {
+@@ -88,10 +80,0 @@
+-
+-                TabRow(selectedTabIndex = selectedTabIndex) {
+-                    tabs.forEachIndexed { index, title ->
+-                        Tab(
+-                            selected = selectedTabIndex == index,
+-                            onClick = { selectedTabIndex = index },
+-                            text = { Text(title) }
+-                        )
+-                    }
+-                }
+@@ -106,2 +89,0 @@
+-                    if (selectedTabIndex == 0) {
+-                        // Preset selector
+@@ -538,71 +520,0 @@
+-                    } else {
+-                        // Autonomous Agent Settings
+-                        Text(
+-                            text = "Autoresearch Genealogy Agent:",
+-                            style = MaterialTheme.typography.labelLarge,
+-                            modifier = Modifier.padding(bottom = 8.dp, top = 8.dp)
+-                        )
+-        
+-                        ApiKeyTextField(
+-                            value = tavilyApiKey,
+-                            onValueChange = { tavilyApiKey = it },
+-                            label = "Tavily API Key (web search)",
+-                            placeholder = "tvly-...",
+-                            supportingText = "Required for autonomous web research agent. Get it at tavily.com",
+-                            modifier = Modifier.fillMaxWidth()
+-                        )
+-        
+-                        OutlinedTextField(
+-                            value = autoresearchRepoPath,
+-                            onValueChange = { autoresearchRepoPath = it },
+-                            label = { Text("Methodology Repository Path") },
+-                            placeholder = { Text("./autoresearch-genealogy") },
+-                            supportingText = { Text("Absolute or relative path to the autoresearch-genealogy repository.") },
+-                            modifier = Modifier
+-                                .fillMaxWidth()
+-                                .padding(bottom = 12.dp),
+-                            singleLine = true
+-                        )
+-        
+-                        OutlinedTextField(
+-                            value = pamyatNarodaCookies,
+-                            onValueChange = { pamyatNarodaCookies = it },
+-                            label = { Text("Archive Cookies (Pamyat Naroda)") },
+-                            placeholder = { Text("PHPSESSID=...;") },
+-                            supportingText = { Text("Paste cookies from your browser log in (F12 -> Application -> Cookies) to bypass login redirects.") },
+-                            trailingIcon = {
+-                                if (pamyatNarodaCookies.isNotEmpty()) {
+-                                    IconButton(onClick = { pamyatNarodaCookies = "" }) {
+-                                        Icon(Icons.Default.Clear, contentDescription = "Clear cookies")
+-                                    }
+-                                }
+-                            },
+-                            modifier = Modifier
+-                                .fillMaxWidth()
+-                                .padding(bottom = 12.dp),
+-                            singleLine = false,
+-                            maxLines = 3
+-                        )
+-        
+-                        OutlinedTextField(
+-                            value = familySearchCookies,
+-                            onValueChange = { familySearchCookies = it },
+-                            label = { Text("Archive Cookies (FamilySearch)") },
+-                            placeholder = { Text("fssessionid=...;") },
+-                            supportingText = { Text("Paste cookies from familysearch.org (F12 -> Application -> Cookies) to use search tool.") },
+-                            trailingIcon = {
+-                                if (familySearchCookies.isNotEmpty()) {
+-                                    IconButton(onClick = { familySearchCookies = "" }) {
+-                                        Icon(Icons.Default.Clear, contentDescription = "Clear cookies")
+-                                    }
+-                                }
+-                            },
+-                            modifier = Modifier
+-                                .fillMaxWidth()
+-                                .padding(bottom = 12.dp),
+-                            singleLine = false,
+-                            maxLines = 3
+-                        )
+-                    }

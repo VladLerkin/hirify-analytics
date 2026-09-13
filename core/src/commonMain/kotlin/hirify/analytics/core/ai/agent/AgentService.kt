@@ -5,11 +5,7 @@ import hirify.analytics.core.analytics.VacancyFilter
 import kotlinx.serialization.json.Json
 
 class AgentService(
-    private val openAiClient: OpenAiClient,
-    private val googleClient: GoogleClient,
-    private val yandexClient: YandexClient,
-    private val ollamaClient: OllamaClient,
-    private val customClient: CustomClient
+    private val aiClientFactory: AiClientFactory
 ) {
     suspend fun parseVoiceToFilter(transcript: String, config: AiConfig): VacancyFilter {
         val prompt = """
@@ -37,15 +33,7 @@ class AgentService(
             
             Dictation: "$transcript"
         """.trimIndent()
-        val client = when (config.getProvider()) {
-            AiProvider.OPENAI -> openAiClient
-            AiProvider.GOOGLE -> googleClient
-            AiProvider.YANDEX -> yandexClient
-            AiProvider.OLLAMA -> ollamaClient
-            AiProvider.CUSTOM -> customClient
-            AiProvider.LOCAL_LLAMATIK -> ollamaClient // fallback
-        }
-        
+        val client = aiClientFactory.createClient(config)
         val response = client.sendPrompt(prompt, config)
         val jsonStr = response.trim().removePrefix("```json").removeSuffix("```").trim()
         

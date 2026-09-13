@@ -8,6 +8,7 @@ import io.ktor.http.isSuccess
 import io.ktor.utils.io.readAvailable
 import io.ktor.client.plugins.timeout
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.request.header
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -27,15 +28,24 @@ class LocalModelManager(
         try {
             val fileWriter = ModelFileWriter()
             
-            // If already downloaded (e.g. exists and is not 0 bytes, but we just check exists for simplicity here)
-            // Wait, for simplicity, if exists we just return finished immediately
-            if (fileWriter.exists(absolutePath)) {
+            val tmpPath = "$absolutePath.tmp"
+            
+            // If already downloaded completely
+            if (fileWriter.exists(absolutePath) && fileWriter.length(absolutePath) > 0) {
                 emit(DownloadStatus.Progress(1.0f))
                 emit(DownloadStatus.Finished(absolutePath))
                 return@flow
             }
             
+            var downloadedBytes = 0L
+            if (fileWriter.exists(tmpPath)) {
+                downloadedBytes = fileWriter.length(tmpPath)
+            }
+            
             httpClient.prepareGet(url) {
+                if (downloadedBytes > 0) {
+                    header(HttpHeaders.Range, "bytes=$downloadedBytes-")
+                }
                 timeout {
                     requestTimeoutMillis = Long.MAX_VALUE
                     socketTimeoutMillis = Long.MAX_VALUE
@@ -46,28 +56,40 @@ class LocalModelManager(
                 }
                 
                 val channel = response.bodyAsChannel()
-                val contentLength = response.headers[io.ktor.http.HttpHeaders.ContentLength]?.toLong() ?: 0L
-                var bytesCopied = 0L
+                var totalBytes = response.headers[io.ktor.http.HttpHeaders.ContentLength]?.toLong() ?: 0L
                 
-                // Truncate/create file
-                fileWriter.writeChunk(absolutePath, ByteArray(0), append = false)
+                if (downloadedBytes > 0 && response.status != io.ktor.http.HttpStatusCode.PartialContent) {
+                    downloadedBytes = 0L
+                    fileWriter.writeChunk(tmpPath, ByteArray(0), append = false)
+                } else if (downloadedBytes > 0) {
+                    if (totalBytes >= 0) totalBytes += downloadedBytes
+                } else {
+                    fileWriter.writeChunk(tmpPath, ByteArray(0), append = false)
+                }
+                
+                var bytesCopied = downloadedBytes
                 
                 val buffer = ByteArray(8192)
                 while (!channel.isClosedForRead) {
                     val read = channel.readAvailable(buffer, 0, buffer.size)
                     if (read > 0) {
                         val bytes = if (read == buffer.size) buffer else buffer.copyOf(read)
-                        fileWriter.writeChunk(absolutePath, bytes, append = true)
+                        fileWriter.writeChunk(tmpPath, bytes, append = true)
                         bytesCopied += read
                         
-                        if (contentLength > 0L) {
-                            emit(DownloadStatus.Progress(bytesCopied.toFloat() / contentLength))
+                        if (totalBytes > 0L) {
+                            emit(DownloadStatus.Progress(bytesCopied.toFloat() / totalBytes))
                         }
                     } else if (read < 0) {
                         break
                     }
                 }
                 
+                if (totalBytes > 0 && bytesCopied != totalBytes) {
+                    throw Exception("Download incomplete: expected $totalBytes bytes but got $bytesCopied bytes")
+                }
+                
+                fileWriter.rename(tmpPath, absolutePath)
                 emit(DownloadStatus.Finished(absolutePath))
             }
         } catch (e: Exception) {
@@ -75,6 +97,18 @@ class LocalModelManager(
             e.printStackTrace()
             emit(DownloadStatus.Error(e))
         }
+    }
+
+    fun isModelDownloaded(fileName: String): Boolean {
+        val dirPath = directoryProvider.getDirectory()
+        val absolutePath = "$dirPath/$fileName"
+        return ModelFileWriter().exists(absolutePath)
+    }
+
+    fun deleteModel(fileName: String) {
+        val dirPath = directoryProvider.getDirectory()
+        val absolutePath = "$dirPath/$fileName"
+        ModelFileWriter().delete(absolutePath)
     }
 }
 

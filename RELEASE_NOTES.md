@@ -1,5 +1,10 @@
 # Hirify Analytics Release Notes
 
+## v1.0.37 (September 2026)
+* **Bug Fix:** Fixed an issue where the `AgentService` would fall back to Ollama instead of using the local LLM client for offline voice processing.
+* **Bug Fix:** Fixed missing `LOCAL_LLAMATIK` logic in `AiSettingsScreen`, which prevented the Local AI model download button from appearing in the UI.
+* **AI Models:** Renamed "Local Gemma 4 E4B QAT" preset to clearly indicate "Offline & Free".
+
 ## v1.0.36 (September 2026)
 * **Bug Fix:** Fixed a UI freeze issue on older machines when pressing "Stop Recording". The heavy initialization of the Sherpa-ONNX model has been moved to a background thread to prevent blocking the UI.
 

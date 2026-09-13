@@ -237,6 +237,85 @@ class AiSettingsScreen : Screen {
                                 }
                             }
                         }
+                        "LOCAL_LLAMATIK" -> {
+                            val localModelManager = org.koin.compose.koinInject<hirify.analytics.core.ai.LocalModelManager>()
+                            var downloadProgress by remember { mutableStateOf(-1f) }
+                            var downloadError by remember { mutableStateOf<String?>(null) }
+                            var isDownloaded by remember(model) { mutableStateOf(localModelManager.isModelDownloaded(model)) }
+                            
+                            Column(modifier = Modifier.padding(bottom = 12.dp)) {
+                                Text(
+                                    text = "Local on-device execution requires downloading the model (~4.5 GB).",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(bottom = 8.dp)
+                                )
+                                
+                                if (isDownloaded) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth()
+                                    ) {
+                                        Text(
+                                            text = "✓ Model '$model' is downloaded and ready.",
+                                            color = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                        TextButton(onClick = {
+                                            localModelManager.deleteModel(model)
+                                            isDownloaded = false
+                                        }) {
+                                            Text("Delete Model", color = MaterialTheme.colorScheme.error)
+                                        }
+                                    }
+                                } else if (downloadProgress >= 0f && downloadProgress <= 1f) {
+                                    LinearProgressIndicator(
+                                        progress = { downloadProgress },
+                                        modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp)
+                                    )
+                                    val p = (downloadProgress * 100).toInt()
+                                    Text("Downloading: $p%", style = MaterialTheme.typography.bodySmall)
+                                } else {
+                                    Button(onClick = {
+                                        scope.launch {
+                                            downloadProgress = 0f
+                                            downloadError = null
+                                            try {
+                                                localModelManager.downloadModel(baseUrl, model).collect { status ->
+                                                    when (status) {
+                                                        is hirify.analytics.core.ai.DownloadStatus.Progress -> {
+                                                            downloadProgress = status.progress
+                                                        }
+                                                        is hirify.analytics.core.ai.DownloadStatus.Finished -> {
+                                                            isDownloaded = true
+                                                            downloadProgress = -1f
+                                                        }
+                                                        is hirify.analytics.core.ai.DownloadStatus.Error -> {
+                                                            downloadError = status.exception.message ?: "Unknown error"
+                                                            downloadProgress = -1f
+                                                        }
+                                                    }
+                                                }
+                                            } catch (e: Exception) {
+                                                downloadError = e.message ?: "Unknown error"
+                                                downloadProgress = -1f
+                                            }
+                                        }
+                                    }) {
+                                        Text("Download Model")
+                                    }
+                                }
+                                
+                                if (downloadError != null) {
+                                    Text(
+                                        text = "Error: $downloadError",
+                                        color = MaterialTheme.colorScheme.error,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        modifier = Modifier.padding(top = 4.dp)
+                                    )
+                                }
+                            }
+                        }
                     }
                     
                     if (provider == "OLLAMA" || provider == "CUSTOM") {

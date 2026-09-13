@@ -36,7 +36,7 @@ val coreModule = module {
     single { YandexSpeechClient(get(), get()) }
     single { TranscriptionClientFactory(get(), get(), get()) }
 
-    single { AgentService(get(), get(), get(), get(), get()) }
+    single { AgentService(get()) }
 
     single {
         Json {
