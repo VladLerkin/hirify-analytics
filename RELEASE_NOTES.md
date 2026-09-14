@@ -1,5 +1,8 @@
 # Hirify Analytics Release Notes
 
+## v1.0.38 (September 2026)
+* **Bug Fix:** Fixed iOS compilation issue with ExperimentalForeignApi in ModelFileWriter and SherpaRecognizerManager.
+
 ## v1.0.37 (September 2026)
 * **Bug Fix:** Fixed an issue where the `AgentService` would fall back to Ollama instead of using the local LLM client for offline voice processing.
 * **Bug Fix:** Fixed missing `LOCAL_LLAMATIK` logic in `AiSettingsScreen`, which prevented the Local AI model download button from appearing in the UI.

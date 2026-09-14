@@ -10,4 +10,8 @@ actual class SherpaRecognizerManager actual constructor() {
     actual suspend fun transcribeAudio(audioData: ByteArray, language: String): String {
         throw UnsupportedOperationException("Vosk local STT is not yet supported on iOS.")
     }
+    
+    actual fun deleteModel(language: String) {
+        // Not yet supported
+    }
 }

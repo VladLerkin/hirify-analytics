@@ -13,8 +13,8 @@ import platform.Foundation.truncateFileAtOffset
 import platform.Foundation.writeData
 import platform.Foundation.closeFile
 
+@OptIn(ExperimentalForeignApi::class)
 actual class ModelFileWriter actual constructor() {
-    @OptIn(ExperimentalForeignApi::class)
     actual fun writeChunk(absolutePath: String, bytes: ByteArray, append: Boolean) {
         val data = bytes.usePinned { pinned ->
             NSData.dataWithBytes(pinned.addressOf(0), bytes.size.toULong())
@@ -41,8 +41,7 @@ actual class ModelFileWriter actual constructor() {
 
     actual fun delete(absolutePath: String): Boolean {
         if (!exists(absolutePath)) return true
-        val errorPtr = alloc<ObjCObjectVar<NSError?>>()
-        val result = NSFileManager.defaultManager.removeItemAtPath(absolutePath, errorPtr)
+        val result = NSFileManager.defaultManager.removeItemAtPath(absolutePath, null)
         return result
     }
     actual fun length(absolutePath: String): Long {
