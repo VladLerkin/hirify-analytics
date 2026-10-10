@@ -1,5 +1,9 @@
 # Hirify Analytics Release Notes
 
+## v1.0.39 (October 2026)
+* **Dependency Updates:** Updated Kotlin to 2.4.21, Compose Multiplatform to 1.12.1, AGP to 9.4.1, Ktor to 3.6.0, and Apache Commons Compress to 1.28.0.
+* **Build Improvements:** Upgraded Gradle wrapper to the latest stable version (9.8.1).
+
 ## v1.0.38 (September 2026)
 * **Bug Fix:** Fixed iOS compilation issue with ExperimentalForeignApi in ModelFileWriter and SherpaRecognizerManager.
 
