@@ -1,5 +1,8 @@
 # Hirify Analytics Release Notes
 
+## v1.0.40 (October 2026)
+* **Build Improvements:** Updated GitHub Actions to use `gradle/actions/setup-gradle@v4` instead of the deprecated `setup-java` caching.
+
 ## v1.0.39 (October 2026)
 * **Dependency Updates:** Updated Kotlin to 2.4.21, Compose Multiplatform to 1.12.1, AGP to 9.4.1, Ktor to 3.6.0, and Apache Commons Compress to 1.28.0.
 * **Build Improvements:** Upgraded Gradle wrapper to the latest stable version (9.8.1).
