@@ -7,7 +7,7 @@ import androidx.compose.runtime.getValue
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
+import androidx.compose.runtime.DisposableEffect
 import org.koin.compose.koinInject
 
 class MainWorkspaceScreen : Screen {
@@ -17,11 +17,10 @@ class MainWorkspaceScreen : Screen {
         val viewModel = koinInject<MainViewModel>()
         val state by viewModel.state.collectAsState()
         
-        LifecycleEffect(
-            onStarted = {
-                viewModel.reload()
-            }
-        )
+        DisposableEffect(Unit) {
+            viewModel.reload()
+            onDispose { }
+        }
 
         // Host the existing main screen
         MainScreen()

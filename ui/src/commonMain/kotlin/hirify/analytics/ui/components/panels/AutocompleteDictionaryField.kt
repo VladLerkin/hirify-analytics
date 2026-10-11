@@ -91,7 +91,7 @@ fun AutocompleteDictionaryField(
                     expanded = true
                 },
                 placeholder = { Text(placeholder ?: strings.searchPlaceholder) },
-                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable, true).fillMaxWidth(),
+                modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, true).fillMaxWidth(),
                 singleLine = true,
                 trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)

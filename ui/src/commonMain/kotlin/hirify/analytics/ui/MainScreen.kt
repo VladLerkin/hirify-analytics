@@ -19,7 +19,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.OpenInBrowser
-import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.ui.platform.LocalUriHandler
 import hirify.analytics.ui.components.panels.LeftSidebar
 import hirify.analytics.ui.render.ChartRenderer
@@ -106,7 +106,7 @@ fun MainScreen() {
                                 Icon(androidx.compose.material.icons.Icons.Filled.Settings, contentDescription = strings.settings)
                             }
                             IconButton(onClick = { exitRequested = true }) {
-                                Icon(Icons.Filled.ExitToApp, contentDescription = strings.exit)
+                                Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = strings.exit)
                             }
                         } else {
                             Box {
@@ -147,7 +147,7 @@ fun MainScreen() {
                                             showMenu = false
                                             exitRequested = true 
                                         },
-                                        leadingIcon = { Icon(Icons.Filled.ExitToApp, contentDescription = null) }
+                                        leadingIcon = { Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null) }
                                     )
                                 }
                             }
@@ -189,7 +189,7 @@ fun MainScreen() {
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
                     // Series Tabs
-                    ScrollableTabRow(
+                    PrimaryScrollableTabRow(
                         selectedTabIndex = state.activeSeriesIndex,
                         edgePadding = 8.dp,
                         containerColor = MaterialTheme.colorScheme.surface,
@@ -247,7 +247,7 @@ fun MainScreen() {
                     Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
                         val activeSeries = state.seriesList.getOrNull(state.activeSeriesIndex)
                         if (activeSeries?.error != null) {
-                            Text(text = activeSeries.error!!, color = MaterialTheme.colorScheme.error, modifier = Modifier.align(Alignment.Center))
+                            Text(text = activeSeries.error, color = MaterialTheme.colorScheme.error, modifier = Modifier.align(Alignment.Center))
                         } else {
                             ChartRenderer(
                                 seriesList = state.seriesList,

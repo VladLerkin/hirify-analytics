@@ -18,7 +18,7 @@ import hirify.analytics.core.analytics.HirifyApiClient
 import hirify.analytics.ui.i18n.LocalAppStrings
 import org.koin.compose.koinInject
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.HelpOutline
+import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -367,7 +367,7 @@ private fun FilterSection(
                     val tooltipState = rememberTooltipState()
                     val scope = rememberCoroutineScope()
                     TooltipBox(
-                        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
                         tooltip = {
                             PlainTooltip {
                                 Text(tooltip, fontSize = 12.sp)
@@ -376,7 +376,7 @@ private fun FilterSection(
                         state = tooltipState
                     ) {
                         Icon(
-                            imageVector = Icons.Outlined.HelpOutline,
+                            imageVector = Icons.AutoMirrored.Outlined.HelpOutline,
                             contentDescription = "Info",
                             modifier = Modifier
                                 .size(24.dp)

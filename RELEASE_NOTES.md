@@ -1,5 +1,10 @@
 # Hirify Analytics Release Notes
 
+## v1.0.42 (October 2026)
+* **Build & Memory Fix:** Increased Gradle heap memory to 4GB (`-Xmx4096m`) to prevent JVM GC thrashing / OutOfMemory during Android Release builds on CI. Removed deprecated `kotlin.mpp.androidSourceSetLayoutVersion`.
+* **Compose API Modernization:** Replaced deprecated Compose Material 3 APIs (`ScrollableTabRow` -> `PrimaryScrollableTabRow`, `MenuAnchorType` -> `ExposedDropdownMenuAnchorType`, `rememberPlainTooltipPositionProvider` -> `rememberTooltipPositionProvider`).
+* **Icons & Lifecycle Fixes:** Migrated `Icons.Filled.ExitToApp` and `Icons.Outlined.HelpOutline` to `AutoMirrored` variants; replaced deprecated Voyager `LifecycleEffect` with standard `DisposableEffect`.
+
 ## v1.0.41 (October 2026)
 * **Kotlin 2.4 Modernization & Refactoring:** Refactored AI clients and `MainViewModel` using modern Kotlin idioms (`sealed interface`, `entries` enum resolution, `require`/`error` contracts, streamlined coroutine flow & cancellation handling). Extracted shared `OpenAiCompatibleJson` mapper.
 * **Cleanup:** Removed deprecated Yandex Cloud integration (YandexGPT and Yandex SpeechKit), unreferenced dialogs and dead legacy components (`ResourceLoader`, `UiAction`, unused config fields).
