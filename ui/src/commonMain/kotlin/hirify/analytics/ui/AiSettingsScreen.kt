@@ -26,7 +26,6 @@ import hirify.analytics.core.ai.sendPromptSafe
 import hirify.analytics.core.ai.AiResult
 import org.koin.compose.koinInject
 import kotlinx.coroutines.launch
-import hirify.analytics.core.ai.agent.AgentService
 import hirify.analytics.ui.i18n.LocalAppStrings
 import hirify.analytics.ui.i18n.LocalLanguageUpdater
 
@@ -59,8 +58,6 @@ class AiSettingsScreen : Screen {
         
         var openAiKey by remember { mutableStateOf(initialConfig.openaiApiKey) }
         var googleKey by remember { mutableStateOf(initialConfig.googleAiApiKey) }
-        var yandexKey by remember { mutableStateOf(initialConfig.yandexApiKey) }
-        var yandexFolderId by remember { mutableStateOf(initialConfig.yandexFolderId) }
         var hirifyKey by remember { mutableStateOf(initialConfig.hirifyApiKey) }
         var interfaceLanguage by remember { mutableStateOf(initialConfig.interfaceLanguage) }
         val scope = rememberCoroutineScope()
@@ -92,8 +89,6 @@ class AiSettingsScreen : Screen {
                                 googleApiKey = googleApiKey,
                                 openaiApiKey = openAiKey,
                                 googleAiApiKey = googleKey,
-                                yandexApiKey = yandexKey,
-                                yandexFolderId = yandexFolderId,
                                 hirifyApiKey = hirifyKey,
                                 interfaceLanguage = interfaceLanguage
                             )
@@ -197,27 +192,6 @@ class AiSettingsScreen : Screen {
                                 placeholder = "AIza...",
                                 supportingText = strings.keyStoredInMemory,
                                 modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                        "YANDEX" -> {
-                            ApiKeyTextField(
-                                value = yandexKey,
-                                onValueChange = { yandexKey = it },
-                                label = strings.yandexApiKeyLabel,
-                                placeholder = "AQVN...",
-                                supportingText = strings.keyStoredInMemory,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            OutlinedTextField(
-                                value = yandexFolderId,
-                                onValueChange = { yandexFolderId = it },
-                                label = { Text(strings.yandexFolderIdLabel) },
-                                placeholder = { Text("default or b1g...") },
-                                supportingText = { Text(strings.yandexFolderIdSupportingText) },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 12.dp),
-                                singleLine = true
                             )
                         }
                         "OLLAMA", "CUSTOM" -> {
@@ -372,7 +346,6 @@ class AiSettingsScreen : Screen {
                         "OPENAI_WHISPER" to strings.openaiWhisperProvider,
                         "SHERPA_LOCAL" to strings.sherpaLocalProvider,
                         "GOOGLE_SPEECH" to strings.googleSpeechProvider,
-                        "YANDEX_SPEECHKIT" to strings.yandexSpeechKitProvider
                     )
                     
                     Box(modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
@@ -498,16 +471,6 @@ class AiSettingsScreen : Screen {
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
-                    if (transcriptionProvider == "YANDEX_SPEECHKIT") {
-                        ApiKeyTextField(
-                            value = yandexKey,
-                            onValueChange = { yandexKey = it },
-                            label = strings.yandexSpeechKitApiKeyLabel,
-                            placeholder = "AQVN...",
-                            supportingText = strings.yandexSpeechKitApiKeySupportingText,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
 
 
                     Text(
@@ -580,8 +543,6 @@ class AiSettingsScreen : Screen {
                                         googleApiKey = googleApiKey,
                                         openaiApiKey = openAiKey,
                                         googleAiApiKey = googleKey,
-                                        yandexApiKey = yandexKey,
-                                        yandexFolderId = yandexFolderId,
                                         hirifyApiKey = hirifyKey,
                                         interfaceLanguage = interfaceLanguage
                                     )
@@ -600,7 +561,6 @@ class AiSettingsScreen : Screen {
                                     val sttEquivalentProvider = when (transcriptionProvider) {
                                         "OPENAI_WHISPER" -> "OPENAI"
                                         "GOOGLE_SPEECH" -> "GOOGLE"
-                                        "YANDEX_SPEECHKIT" -> "YANDEX"
                                         else -> null
                                     }
                                     
@@ -608,7 +568,6 @@ class AiSettingsScreen : Screen {
                                         val defaultModelForStt = when (sttEquivalentProvider) {
                                             "GOOGLE" -> "gemini-2.5-flash"
                                             "OPENAI" -> "gpt-4o-mini"
-                                            "YANDEX" -> "yandexgpt-lite"
                                             else -> currentConfig.model
                                         }
                                         val sttConfig = currentConfig.copy(

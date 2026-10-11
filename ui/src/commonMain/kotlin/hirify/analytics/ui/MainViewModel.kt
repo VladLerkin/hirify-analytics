@@ -52,12 +52,18 @@ class MainViewModel(
 
     fun updateFilter(filter: VacancyFilter) {
         val currentIndex = state.value.activeSeriesIndex
-        state.update { state ->
-            val updatedList = state.seriesList.toMutableList()
-            updatedList[currentIndex] = updatedList[currentIndex].copy(filter = filter)
-            state.copy(seriesList = updatedList)
-        }
+        updateSeries(currentIndex) { it.copy(filter = filter) }
         loadDataForSeries(currentIndex)
+    }
+
+    /** Applies [transform] to the series at [index], ignoring indices that no longer exist. */
+    private inline fun updateSeries(index: Int, crossinline transform: (ChartSeries) -> ChartSeries) {
+        state.update { current ->
+            if (index !in current.seriesList.indices) return@update current
+            current.copy(
+                seriesList = current.seriesList.mapIndexed { i, series -> if (i == index) transform(series) else series }
+            )
+        }
     }
 
     fun addSeries() {
@@ -97,34 +103,12 @@ class MainViewModel(
         if (index !in state.value.seriesList.indices) return
 
         viewModelScope.launch(Dispatchers.Default) {
-            state.update { state ->
-                val updatedList = state.seriesList.toMutableList()
-                updatedList[index] = updatedList[index].copy(isLoading = true, error = null)
-                state.copy(seriesList = updatedList)
-            }
+            updateSeries(index) { it.copy(isLoading = true, error = null) }
 
             val filter = state.value.seriesList[index].filter
-            val result = apiClient.getAnalyticsCount(filter)
-            
-            result
-                    .onSuccess { response ->
-                        state.update { state ->
-                            val updatedList = state.seriesList.toMutableList()
-                            if (index < updatedList.size) { // check bounds in case it was removed
-                                updatedList[index] = updatedList[index].copy(data = response, isLoading = false)
-                            }
-                            state.copy(seriesList = updatedList)
-                        }
-                    }
-                    .onFailure { error ->
-                        state.update { state ->
-                            val updatedList = state.seriesList.toMutableList()
-                            if (index < updatedList.size) {
-                                updatedList[index] = updatedList[index].copy(error = error.message, isLoading = false)
-                            }
-                            state.copy(seriesList = updatedList)
-                        }
-                    }
+            apiClient.getAnalyticsCount(filter)
+                .onSuccess { response -> updateSeries(index) { it.copy(data = response, isLoading = false) } }
+                .onFailure { error -> updateSeries(index) { it.copy(error = error.message, isLoading = false) } }
         }
     }
 }

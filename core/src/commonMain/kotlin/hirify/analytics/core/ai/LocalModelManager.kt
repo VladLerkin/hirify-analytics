@@ -112,8 +112,8 @@ class LocalModelManager(
     }
 }
 
-sealed class DownloadStatus {
-    data class Progress(val progress: Float) : DownloadStatus()
-    data class Finished(val absolutePath: String) : DownloadStatus()
-    data class Error(val exception: Exception) : DownloadStatus()
+sealed interface DownloadStatus {
+    data class Progress(val progress: Float) : DownloadStatus
+    data class Finished(val absolutePath: String) : DownloadStatus
+    data class Error(val exception: Exception) : DownloadStatus
 }

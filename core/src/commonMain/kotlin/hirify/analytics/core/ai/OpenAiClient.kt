@@ -1,20 +1,21 @@
 package hirify.analytics.core.ai
 
 import io.ktor.client.request.*
-import kotlinx.serialization.json.*
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
+import kotlinx.serialization.json.*
 
 /**
  * Client for OpenAI API.
  */
 class OpenAiClient : BaseAiClient() {
-    
+
     override suspend fun sendPrompt(prompt: String, config: AiConfig): String {
         val message = sendChat(
             messages = listOf(AiMessage(role = "user", content = prompt)),
             config = config
         )
-        return message.content ?: ""
+        return message.content.orEmpty()
     }
 
     override suspend fun sendChat(
@@ -23,149 +24,62 @@ class OpenAiClient : BaseAiClient() {
         tools: List<AiToolDescriptor>
     ): AiMessage {
         val apiKey = config.getApiKeyForProvider()
-        if (apiKey.isBlank()) {
-            throw IllegalArgumentException("OpenAI API key is required. Please configure it in the AI Settings menu.")
-        }
-        
+        require(apiKey.isNotBlank()) { "OpenAI API key is required. Please configure it in the AI Settings menu." }
+
         val baseUrl = config.baseUrl.ifBlank { "https://api.openai.com/v1" }
         val url = "$baseUrl/chat/completions"
-        
-        val requestBody = buildJsonObject {
-            put("model", config.model)
-            put("temperature", config.temperature)
-            put("max_tokens", config.maxTokens)
-            putJsonArray("messages") {
-                messages.forEach { msg ->
-                    addJsonObject {
-                        put("role", msg.role)
-                        
-                        // OpenAI requires 'content' to be a string for 'assistant' and 'tool' roles.
-                        // If it's null, we must explicitly send an empty string or null (depending on API version),
-                        // but the error "expected a string, got null" suggests it must be a string.
-                        val content = msg.content ?: if (msg.role == "assistant" || msg.role == "tool") "" else null
-                        content?.let { put("content", it) }
-                        
-                        msg.toolCallId?.let { put("tool_call_id", it) }
-                        msg.toolCalls?.let { calls ->
-                            putJsonArray("tool_calls") {
-                                calls.forEach { call ->
-                                    addJsonObject {
-                                        put("id", call.id)
-                                        put("type", call.type)
-                                        putJsonObject("function") {
-                                            put("name", call.function.name)
-                                            put("arguments", call.function.arguments)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            if (tools.isNotEmpty()) {
-                putJsonArray("tools") {
-                    tools.forEach { tool ->
-                        addJsonObject {
-                            put("type", "function")
-                            putJsonObject("function") {
-                                put("name", tool.name)
-                                put("description", tool.description)
-                                put("parameters", tool.parameters)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        
-        println("[AI-DEBUG] OpenAI Request JSON: " + requestBody.toString())
-        
-        var attempt = 0
-        val maxAttempts = 6
-        var responseText = ""
-        var responseJson: JsonObject = buildJsonObject {}
-        
-        while (attempt < maxAttempts) {
+
+        val requestBody = OpenAiCompatibleJson.buildChatRequest(messages, config, tools).toString()
+        println("[AI-DEBUG] OpenAI Request JSON: $requestBody")
+
+        for (attempt in 1..MAX_ATTEMPTS) {
+            var responseJson: JsonObject? = null
             try {
-                responseText = executeRequest(url, requestBody.toString()) {
+                val responseText = executeRequest(url, requestBody) {
                     header("Authorization", "Bearer $apiKey")
                 }
-                
-                responseJson = json.parseToJsonElement(responseText).jsonObject
-                
-                val errorObj = responseJson["error"]?.jsonObject
-                val isRateLimit = errorObj?.get("code")?.jsonPrimitive?.contentOrNull == "rate_limit_exceeded" ||
-                                  errorObj?.get("type")?.jsonPrimitive?.contentOrNull == "tokens" ||
-                                  errorObj?.get("message")?.jsonPrimitive?.contentOrNull?.contains("Rate limit") == true
-                
-                if (isRateLimit) {
-                    throw Exception("Rate limit exceeded")
-                }
-                
-                val choices = responseJson["choices"]?.jsonArray
-                if (choices == null || choices.isEmpty()) {
-                    throw Exception("No choices in OpenAI response: $responseText")
-                }
-                
-                break // Success, exit retry loop
+                val parsed = json.parseToJsonElement(responseText).jsonObject
+                responseJson = parsed
+
+                if (parsed.isRateLimitError()) error("Rate limit exceeded")
+
+                val choice = parsed["choices"]?.jsonArray?.firstOrNull()
+                    ?: error("No choices in OpenAI response: $responseText")
+                val messageObj = choice.jsonObject["message"]?.jsonObject
+                    ?: error("No message in OpenAI choice")
+                return OpenAiCompatibleJson.parseAssistantMessage(messageObj)
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
-                val isRateLimitException = e.message?.contains("Rate limit exceeded") == true || 
-                                           e.message?.contains("429") == true
-                
-                attempt++
-                if (attempt >= maxAttempts || !isRateLimitException) {
-                    throw e
-                }
-                
-                // Extract wait time if possible, otherwise exponential backoff
-                var waitMs = 2000L * attempt
-                val errorMsg = responseJson["error"]?.jsonObject?.get("message")?.jsonPrimitive?.contentOrNull
-                if (errorMsg != null) {
-                    // Try to match "Please try again in Xms."
-                    val msMatch = Regex("in (\\d+)ms").find(errorMsg)
-                    if (msMatch != null) {
-                        waitMs = msMatch.groupValues[1].toLongOrNull() ?: waitMs
-                    } else {
-                        // Match seconds "in Xs."
-                        val sMatch = Regex("in (\\d+(?:\\.\\d+)?)s").find(errorMsg)
-                        if (sMatch != null) {
-                            waitMs = ((sMatch.groupValues[1].toDoubleOrNull() ?: 1.0) * 1000).toLong()
-                        }
-                    }
-                }
-                
-                // Add a small buffer to the requested wait time
-                waitMs += 500L
-                println("[AI-DEBUG] OpenAI Rate Limit hit! Retrying in ${waitMs}ms (Attempt $attempt of $maxAttempts)...")
+                val isRateLimit = e.message?.let { "Rate limit exceeded" in it || "429" in it } == true
+                if (attempt >= MAX_ATTEMPTS || !isRateLimit) throw e
+
+                // Honour the server-suggested wait time if present, otherwise back off linearly
+                val waitMs = (responseJson.suggestedRetryDelayMs() ?: (2000L * attempt)) + 500L
+                println("[AI-DEBUG] OpenAI Rate Limit hit! Retrying in ${waitMs}ms (Attempt $attempt of $MAX_ATTEMPTS)...")
                 delay(waitMs)
             }
         }
-        
-        val choices = responseJson["choices"]?.jsonArray!!
-        val messageObj = choices[0].jsonObject["message"]?.jsonObject
-            ?: throw Exception("No message in OpenAI choice")
-            
-        val role = messageObj["role"]?.jsonPrimitive?.content ?: "assistant"
-        val content = messageObj["content"]?.jsonPrimitive?.contentOrNull
-        
-        val toolCalls = messageObj["tool_calls"]?.jsonArray?.map { callElement ->
-            val callObj = callElement.jsonObject
-            val funcObj = callObj["function"]?.jsonObject ?: throw Exception("No function in tool call")
-            AiToolCall(
-                id = callObj["id"]?.jsonPrimitive?.content ?: "",
-                type = callObj["type"]?.jsonPrimitive?.content ?: "function",
-                function = AiFunctionCall(
-                    name = funcObj["name"]?.jsonPrimitive?.content ?: "",
-                    arguments = funcObj["arguments"]?.jsonPrimitive?.content ?: "{}"
-                )
-            )
-        }
-        
-        return AiMessage(
-            role = role,
-            content = content,
-            toolCalls = toolCalls
-        )
+        error("Unreachable: retry loop always returns or throws")
+    }
+
+    private fun JsonObject.isRateLimitError(): Boolean {
+        val errorObj = this["error"]?.jsonObject ?: return false
+        return errorObj["code"]?.jsonPrimitive?.contentOrNull == "rate_limit_exceeded" ||
+            errorObj["type"]?.jsonPrimitive?.contentOrNull == "tokens" ||
+            errorObj["message"]?.jsonPrimitive?.contentOrNull?.contains("Rate limit") == true
+    }
+
+    /** Parses "Please try again in Xms." / "in Xs." from the error message. */
+    private fun JsonObject?.suggestedRetryDelayMs(): Long? {
+        val errorMsg = this?.get("error")?.jsonObject?.get("message")?.jsonPrimitive?.contentOrNull ?: return null
+        MILLIS_REGEX.find(errorMsg)?.let { return it.groupValues[1].toLongOrNull() }
+        return SECONDS_REGEX.find(errorMsg)?.let { ((it.groupValues[1].toDoubleOrNull() ?: 1.0) * 1000).toLong() }
+    }
+
+    private companion object {
+        const val MAX_ATTEMPTS = 6
+        val MILLIS_REGEX = Regex("""in (\d+)ms""")
+        val SECONDS_REGEX = Regex("""in (\d+(?:\.\d+)?)s""")
     }
 }

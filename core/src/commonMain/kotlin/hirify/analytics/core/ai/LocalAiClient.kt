@@ -5,6 +5,7 @@ import com.llamatik.library.platform.LlamaBridge
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlin.random.Random
 
 class LocalAiClient(
     private val directoryProvider: ModelDirectoryProvider
@@ -86,7 +87,7 @@ class LocalAiClient(
             
             toolCalls.add(
                 AiToolCall(
-                    id = "call_" + kotlin.random.Random.nextInt(10000, 99999),
+                    id = "call_${Random.nextInt(10000, 99999)}",
                     function = AiFunctionCall(
                         name = functionName,
                         arguments = argsJson
@@ -113,7 +114,7 @@ class LocalAiClient(
                     
                     toolCalls.add(
                         AiToolCall(
-                            id = "call_" + kotlin.random.Random.nextInt(10000, 99999),
+                            id = "call_${Random.nextInt(10000, 99999)}",
                             function = AiFunctionCall(
                                 name = functionName,
                                 arguments = argsJson
@@ -135,7 +136,7 @@ class LocalAiClient(
             if (toolCalls.none { it.function.name == functionName }) {
                 toolCalls.add(
                     AiToolCall(
-                        id = "call_" + kotlin.random.Random.nextInt(10000, 99999),
+                        id = "call_${Random.nextInt(10000, 99999)}",
                         function = AiFunctionCall(
                             name = functionName,
                             arguments = "{}"

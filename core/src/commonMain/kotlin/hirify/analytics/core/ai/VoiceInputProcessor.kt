@@ -1,6 +1,8 @@
 package hirify.analytics.core.ai
 
+import hirify.analytics.core.ai.agent.AgentService
 import hirify.analytics.core.analytics.VacancyFilter
+import hirify.analytics.core.platform.AudioFormat
 import hirify.analytics.core.platform.VoiceRecorder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +18,7 @@ class VoiceInputProcessor(
     private val voiceRecorder: VoiceRecorder,
     private val settingsStorage: AiSettingsStorage,
     private val transcriptionClientFactory: TranscriptionClientFactory,
-    private val agentService: hirify.analytics.core.ai.agent.AgentService,
+    private val agentService: AgentService,
     private val coroutineScope: CoroutineScope
 ) {
     private var autoStopJob: Job? = null
@@ -46,9 +48,9 @@ class VoiceInputProcessor(
         try {
             val config = settingsStorage.loadConfig()
             val audioFormat = when (config.transcriptionProvider) {
-                "YANDEX_SPEECHKIT", "SHERPA_LOCAL" -> hirify.analytics.core.platform.AudioFormat.WAV
-                "GOOGLE_SPEECH" -> hirify.analytics.core.platform.AudioFormat.FLAC
-                else -> hirify.analytics.core.platform.AudioFormat.M4A
+                "SHERPA_LOCAL" -> AudioFormat.WAV
+                "GOOGLE_SPEECH" -> AudioFormat.FLAC
+                else -> AudioFormat.M4A
             }
             
             voiceRecorder.startRecording(

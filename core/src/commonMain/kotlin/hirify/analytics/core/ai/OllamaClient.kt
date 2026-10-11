@@ -1,5 +1,6 @@
 package hirify.analytics.core.ai
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.json.*
 
 /**
@@ -107,7 +108,7 @@ class OllamaClient : BaseAiClient() {
                 content = content,
                 toolCalls = if (toolCalls.isNullOrEmpty()) null else toolCalls
             )
-        } catch (e: kotlinx.coroutines.CancellationException) {
+        } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             throw Exception(

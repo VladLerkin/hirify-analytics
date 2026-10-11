@@ -1,5 +1,6 @@
 package hirify.analytics.core.ai
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 
@@ -90,7 +91,6 @@ data class AiToolDescriptor(
 class AiClientFactory(
     private val openAiClient: OpenAiClient,
     private val googleClient: GoogleClient,
-    private val yandexClient: YandexClient,
     private val ollamaClient: OllamaClient,
     private val customClient: CustomClient,
     private val localAiClient: LocalAiClient
@@ -102,7 +102,6 @@ class AiClientFactory(
         return when (provider) {
             AiProvider.OPENAI -> openAiClient
             AiProvider.GOOGLE -> googleClient
-            AiProvider.YANDEX -> yandexClient
             AiProvider.OLLAMA -> ollamaClient
             AiProvider.CUSTOM -> customClient
             AiProvider.LOCAL_LLAMATIK -> localAiClient
@@ -120,22 +119,19 @@ class AiClientFactory(
 /**
  * Result of AI request execution.
  */
-sealed class AiResult {
-    data class Success(val text: String) : AiResult()
-    data class Error(val message: String, val cause: Throwable? = null) : AiResult()
+sealed interface AiResult {
+    data class Success(val text: String) : AiResult
+    data class Error(val message: String, val cause: Throwable? = null) : AiResult
 }
 
 /**
  * Wrapper for safe execution of AI requests with error handling.
+ * Coroutine cancellation is propagated, not converted into [AiResult.Error].
  */
-suspend fun AiClient.sendPromptSafe(prompt: String, config: AiConfig): AiResult {
-    return try {
-        val response = sendPrompt(prompt, config)
-        AiResult.Success(response)
-    } catch (e: Exception) {
-        AiResult.Error(
-            message = "Failed to get AI response: ${e.message}",
-            cause = e
-        )
-    }
+suspend fun AiClient.sendPromptSafe(prompt: String, config: AiConfig): AiResult = try {
+    AiResult.Success(sendPrompt(prompt, config))
+} catch (e: CancellationException) {
+    throw e
+} catch (e: Exception) {
+    AiResult.Error(message = "Failed to get AI response: ${e.message}", cause = e)
 }

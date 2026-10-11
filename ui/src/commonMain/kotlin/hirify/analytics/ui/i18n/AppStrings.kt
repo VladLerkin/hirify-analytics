@@ -142,12 +142,6 @@ interface AppStrings {
     val googleSpeechApiKeyLabel: String
     val googleSpeechApiKeySupportingText: String
     val googleSpeechProvider: String
-    val yandexApiKeyLabel: String
-    val yandexSpeechKitApiKeyLabel: String
-    val yandexSpeechKitApiKeySupportingText: String
-    val yandexSpeechKitProvider: String
-    val yandexFolderIdLabel: String
-    val yandexFolderIdSupportingText: String
     val keyStoredInMemory: String
 
     // About Screen
@@ -294,12 +288,6 @@ object EnStrings : AppStrings {
     override val googleSpeechApiKeyLabel = "Google AI API Key (Speech-to-Text)"
     override val googleSpeechApiKeySupportingText = "API key for Google Speech-to-Text."
     override val googleSpeechProvider = "Google Speech-to-Text (best for Georgian)"
-    override val yandexApiKeyLabel = "YandexGPT API Key"
-    override val yandexSpeechKitApiKeyLabel = "Yandex Cloud API Key (SpeechKit)"
-    override val yandexSpeechKitApiKeySupportingText = "API key for Yandex SpeechKit."
-    override val yandexSpeechKitProvider = "Yandex SpeechKit (best for Russian and CIS languages)"
-    override val yandexFolderIdLabel = "Folder ID (optional)"
-    override val yandexFolderIdSupportingText = "Yandex Cloud Folder ID. Leave as 'default' for automatic detection."
     override val keyStoredInMemory = "Provided key is stored in memory and masked in logs."
 
     override val aboutTitle = "About Hirify Analytics"
@@ -445,12 +433,6 @@ object RuStrings : AppStrings {
     override val googleSpeechApiKeyLabel = "Google AI API Ключ (Speech-to-Text)"
     override val googleSpeechApiKeySupportingText = "Ключ API для Google Speech-to-Text."
     override val googleSpeechProvider = "Google Speech-to-Text (лучше для грузинского)"
-    override val yandexApiKeyLabel = "YandexGPT API Ключ"
-    override val yandexSpeechKitApiKeyLabel = "Yandex Cloud API Ключ (SpeechKit)"
-    override val yandexSpeechKitApiKeySupportingText = "Ключ API для Yandex SpeechKit."
-    override val yandexSpeechKitProvider = "Yandex SpeechKit (лучше для русского и языков СНГ)"
-    override val yandexFolderIdLabel = "Folder ID (опционально)"
-    override val yandexFolderIdSupportingText = "Yandex Cloud Folder ID. Оставьте 'default' для автоопределения."
     override val keyStoredInMemory = "Ключ сохраняется в памяти и маскируется в логах."
 
     override val aboutTitle = "О Hirify Analytics"

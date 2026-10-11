@@ -7,6 +7,10 @@ actual class SherpaRecognizerManager actual constructor() {
     
     actual fun isModelDownloaded(language: String): Boolean = false
     
+    actual fun deleteModel(language: String) {
+        // No local models on Web
+    }
+    
     actual suspend fun transcribeAudio(audioData: ByteArray, language: String): String {
         throw UnsupportedOperationException("Vosk local STT is not yet supported on Web.")
     }

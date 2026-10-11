@@ -1,5 +1,11 @@
 # Hirify Analytics Release Notes
 
+## v1.0.41 (October 2026)
+* **Kotlin 2.4 Modernization & Refactoring:** Refactored AI clients and `MainViewModel` using modern Kotlin idioms (`sealed interface`, `entries` enum resolution, `require`/`error` contracts, streamlined coroutine flow & cancellation handling). Extracted shared `OpenAiCompatibleJson` mapper.
+* **Cleanup:** Removed deprecated Yandex Cloud integration (YandexGPT and Yandex SpeechKit), unreferenced dialogs and dead legacy components (`ResourceLoader`, `UiAction`, unused config fields).
+* **Cross-platform Fixes:** Added missing `actual` implementations and fixed Wasm target compilation issues (`DateUtils`, `SherpaRecognizerManager`).
+* **Desktop Security:** Refactored `AiSettingsStorage` on desktop to use standard library `kotlin.io.encoding.Base64` and clean secret management.
+
 ## v1.0.40 (October 2026)
 * **Build Improvements:** Updated GitHub Actions to use `gradle/actions/setup-gradle@v4` instead of the deprecated `setup-java` caching.
 
