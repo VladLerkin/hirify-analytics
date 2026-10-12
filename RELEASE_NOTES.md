@@ -1,5 +1,9 @@
 # Hirify Analytics Release Notes
 
+## v1.0.46 (October 2026)
+* **Skill & Automation Improvements:** Enhanced `check-updates` skill to inspect and report version status of GitHub Actions workflows in `.github/workflows/` alongside Gradle dependencies.
+* **Workflow Modernization:** Updated `actions/setup-java` to the latest major version (`@v6`).
+
 ## v1.0.45 (October 2026)
 * **GitHub Actions Modernization:** Updated CI and Release workflow actions to their latest major releases (`actions/checkout@v7`, `actions/setup-java@v5`, `gradle/actions/setup-gradle@v6`, `android-actions/setup-android@v4`, `actions/upload-artifact@v7`, `actions/download-artifact@v8`, and `softprops/action-gh-release@v3`).
 
