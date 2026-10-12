@@ -24,6 +24,7 @@
 # Models
 -keep class hirify.analytics.core.model.** { *; }
 
-# Fix for Java 25 / ProGuard 7.7 issues with new class versions
+# Fix for Java 25 / ProGuard issues
 -dontwarn **
 -ignorewarnings
+-dontnote **

@@ -1,5 +1,9 @@
 # Hirify Analytics Release Notes
 
+## v1.0.44 (October 2026)
+* **Desktop ProGuard & JDK Toolchain Fix:** Fixed ProGuard JDK library resolution in `app-desktop` to strictly match the target Java version (Java 25) via toolchain/environment, preventing CI runners from accidentally using legacy JDK 11 JMODs.
+* **ProGuard Logging Clean-up:** Added `-dontnote **` in `proguard-rules.pro` to eliminate hundreds of verbose duplicate resource and descriptor `Note:` messages from build logs.
+
 ## v1.0.43 (October 2026)
 * **Gradle 9.6+ DSL Modernization:** Upgraded build scripts across modules (`app-desktop`, `app-web`, `core`, `ui`) to modern Gradle 9.6+ collection APIs (`named()` instead of deprecated `by getting`).
 * **KMP & Android DSL Cleanup:** Replaced deprecated `androidLibrary` block with `android` in `core`, updated build task registration to `tasks.register(...)`.
