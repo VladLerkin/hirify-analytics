@@ -367,7 +367,7 @@ private fun FilterSection(
                     val tooltipState = rememberTooltipState()
                     val scope = rememberCoroutineScope()
                     TooltipBox(
-                        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
+                        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
                         tooltip = {
                             PlainTooltip {
                                 Text(tooltip, fontSize = 12.sp)

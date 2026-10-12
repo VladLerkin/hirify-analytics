@@ -1,5 +1,11 @@
 # Hirify Analytics Release Notes
 
+## v1.0.43 (October 2026)
+* **Gradle 9.6+ DSL Modernization:** Upgraded build scripts across modules (`app-desktop`, `app-web`, `core`, `ui`) to modern Gradle 9.6+ collection APIs (`named()` instead of deprecated `by getting`).
+* **KMP & Android DSL Cleanup:** Replaced deprecated `androidLibrary` block with `android` in `core`, updated build task registration to `tasks.register(...)`.
+* **CI Build Stability:** Added `kotlin.native.ignoreDisabledTargets=true` to suppress non-macOS host warnings for iOS Simulator tests in Linux CI environments.
+* **Code Modernization:** Replaced deprecated Java `URL` constructors with `URI.create().toURL()`, updated tar archive streaming API, and specified preferred tooltip anchor positioning.
+
 ## v1.0.42 (October 2026)
 * **Build & Memory Fix:** Increased Gradle heap memory to 4GB (`-Xmx4096m`) to prevent JVM GC thrashing / OutOfMemory during Android Release builds on CI. Removed deprecated `kotlin.mpp.androidSourceSetLayoutVersion`.
 * **Compose API Modernization:** Replaced deprecated Compose Material 3 APIs (`ScrollableTabRow` -> `PrimaryScrollableTabRow`, `MenuAnchorType` -> `ExposedDropdownMenuAnchorType`, `rememberPlainTooltipPositionProvider` -> `rememberTooltipPositionProvider`).

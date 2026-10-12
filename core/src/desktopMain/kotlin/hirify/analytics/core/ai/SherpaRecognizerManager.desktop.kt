@@ -95,7 +95,7 @@ actual class SherpaRecognizerManager actual constructor() {
         }
 
         val urlString = getModelUrl(language)
-        val url = URL(urlString)
+        val url = java.net.URI.create(urlString).toURL()
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "GET"
         connection.instanceFollowRedirects = true
@@ -115,7 +115,7 @@ actual class SherpaRecognizerManager actual constructor() {
         
         if (redirect) {
             val newUrl = connection.getHeaderField("Location")
-            actualConnection = URL(newUrl).openConnection() as HttpURLConnection
+            actualConnection = java.net.URI.create(newUrl).toURL().openConnection() as HttpURLConnection
             if (downloadedBytes > 0) {
                 actualConnection.setRequestProperty("Range", "bytes=$downloadedBytes-")
             }
@@ -164,7 +164,7 @@ actual class SherpaRecognizerManager actual constructor() {
             val bufferedIn = tarFile.inputStream().buffered(65536)
             val bzIn = BZip2CompressorInputStream(bufferedIn)
             val tarIn = TarArchiveInputStream(bzIn)
-            var entry = tarIn.nextTarEntry
+            var entry = tarIn.nextEntry
             while (entry != null) {
                 val newFile = File(modelsDir, entry.name)
                 if (entry.isDirectory) {
@@ -175,7 +175,7 @@ actual class SherpaRecognizerManager actual constructor() {
                         tarIn.copyTo(fos)
                     }
                 }
-                entry = tarIn.nextTarEntry
+                entry = tarIn.nextEntry
             }
             tarIn.close()
         }
