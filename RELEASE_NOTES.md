@@ -1,5 +1,8 @@
 # Hirify Analytics Release Notes
 
+## v1.0.45 (October 2026)
+* **GitHub Actions Modernization:** Updated CI and Release workflow actions to their latest major releases (`actions/checkout@v7`, `actions/setup-java@v5`, `gradle/actions/setup-gradle@v6`, `android-actions/setup-android@v4`, `actions/upload-artifact@v7`, `actions/download-artifact@v8`, and `softprops/action-gh-release@v3`).
+
 ## v1.0.44 (October 2026)
 * **Desktop ProGuard & JDK Toolchain Fix:** Fixed ProGuard JDK library resolution in `app-desktop` to strictly match the target Java version (Java 25) via toolchain/environment, preventing CI runners from accidentally using legacy JDK 11 JMODs.
 * **ProGuard Logging Clean-up:** Added `-dontnote **` in `proguard-rules.pro` to eliminate hundreds of verbose duplicate resource and descriptor `Note:` messages from build logs.
