@@ -1,5 +1,8 @@
 # Hirify Analytics Release Notes
 
+## v1.0.48 (October 2026)
+* **iOS Linker Warning Fix:** Raised iOS deployment target from `18.0` to `18.5` to match the Kotlin/Native `libicu` object and remove the "built for newer iOS-simulator version" linker warning.
+
 ## v1.0.47 (October 2026)
 * **Dependency Updates:** Updated Compose Multiplatform to `1.12.2` and kotlinx-serialization to `1.12.0`.
 * **Skill Discovery:** Added `.claude/skills` symlink to `.agents/skills` so Claude Code picks up project skills (`check-updates`, `release-app`, `android-debug-launch`).
