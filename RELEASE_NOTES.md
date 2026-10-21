@@ -1,5 +1,9 @@
 # Hirify Analytics Release Notes
 
+## v1.0.47 (October 2026)
+* **Dependency Updates:** Updated Compose Multiplatform to `1.12.2` and kotlinx-serialization to `1.12.0`.
+* **Skill Discovery:** Added `.claude/skills` symlink to `.agents/skills` so Claude Code picks up project skills (`check-updates`, `release-app`, `android-debug-launch`).
+
 ## v1.0.46 (October 2026)
 * **Skill & Automation Improvements:** Enhanced `check-updates` skill to inspect and report version status of GitHub Actions workflows in `.github/workflows/` alongside Gradle dependencies.
 * **Workflow Modernization:** Updated `actions/setup-java` to the latest major version (`@v6`).
