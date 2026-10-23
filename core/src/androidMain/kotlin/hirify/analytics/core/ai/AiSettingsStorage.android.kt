@@ -54,9 +54,9 @@ actual class AiSettingsStorage {
     
     actual fun loadConfig(): AiConfig {
         return AiConfig(
-            provider = prefs.getString(KEY_PROVIDER, AiPresets.OPENAI_GPT4O_MINI.provider) ?: AiPresets.OPENAI_GPT4O_MINI.provider,
+            provider = prefs.getString(KEY_PROVIDER, AiPresets.OPENAI_GPT6_LUNA.provider) ?: AiPresets.OPENAI_GPT6_LUNA.provider,
             apiKey = prefs.getString(KEY_API_KEY, "") ?: "",
-            model = prefs.getString(KEY_MODEL, AiPresets.OPENAI_GPT4O_MINI.model) ?: AiPresets.OPENAI_GPT4O_MINI.model,
+            model = prefs.getString(KEY_MODEL, AiPresets.OPENAI_GPT6_LUNA.model) ?: AiPresets.OPENAI_GPT6_LUNA.model,
             baseUrl = prefs.getString(KEY_BASE_URL, "") ?: "",
             temperature = prefs.getFloat(KEY_TEMPERATURE, 0.7f).toDouble(),
             maxTokens = prefs.getInt(KEY_MAX_TOKENS, 4000),
@@ -69,7 +69,7 @@ actual class AiSettingsStorage {
 
             googleAiApiKey = prefs.getString(KEY_GOOGLE_AI_API_KEY, "") ?: "",
             hirifyApiKey = prefs.getString(KEY_HIRIFY_API_KEY, "") ?: "",
-        )
+        ).withMigratedModel()
     }
     
     actual fun clearConfig() {

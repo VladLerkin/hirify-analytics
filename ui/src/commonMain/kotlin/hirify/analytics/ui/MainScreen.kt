@@ -262,12 +262,14 @@ fun MainScreen() {
     }
 }
 
+private fun String?.firstItemOrNull(): String? =
+    if (isNullOrEmpty()) null else substringBefore(',').trim()
+
 fun VacancyFilter.toShortLabel(strings: hirify.analytics.ui.i18n.AppStrings): String {
     val parts = mutableListOf<String>()
-    if (!skills.isNullOrEmpty()) parts.add(skills!!.split(",").first().trim())
-    if (!specializations.isNullOrEmpty()) parts.add(specializations!!.split(",").first().trim())
-    if (!grade.isNullOrEmpty()) {
-        val gradeValue = grade!!.split(",").first().trim()
+    skills.firstItemOrNull()?.let(parts::add)
+    specializations.firstItemOrNull()?.let(parts::add)
+    grade.firstItemOrNull()?.let { gradeValue ->
         val mappedGrade = when (gradeValue) {
             "trainee" -> strings.trainee
             "junior" -> strings.junior

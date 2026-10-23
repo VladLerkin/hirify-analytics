@@ -63,7 +63,7 @@ ollama run qwen2.5:7b
 **Symptom:** Importing AI Text fails with a JSON parsing error.
 **Causes & Solutions:**
 The AI model returned malformed JSON or included markdown code blocks instead of raw JSON.
-- **Solution:** Use a more capable model (like GPT-4o-mini or Claude 3.5 Sonnet) for Text Import, as smaller local models sometimes fail strict JSON formatting requirements.
+- **Solution:** Use a more capable model (like GPT-6 Luna or Claude 3.5 Sonnet) for Text Import, as smaller local models sometimes fail strict JSON formatting requirements.
 
 ---
 

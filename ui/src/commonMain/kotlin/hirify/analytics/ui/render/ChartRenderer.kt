@@ -25,13 +25,17 @@ val chartColors = listOf(
     Color(0xFF9C27B0)  // Purple
 )
 
+private data class SeriesBuckets(val series: ChartSeries, val buckets: Map<String, Int>)
+
 @OptIn(ExperimentalTextApi::class)
 @Composable
 fun ChartRenderer(
     seriesList: List<ChartSeries>,
     modifier: Modifier = Modifier
 ) {
-    val activeSeriesData = seriesList.filter { it.data != null && it.data.getParsedBuckets().isNotEmpty() }
+    val activeSeriesData = seriesList.mapNotNull { series ->
+        series.data?.getParsedBuckets()?.takeIf { it.isNotEmpty() }?.let { SeriesBuckets(series, it) }
+    }
     
     if (activeSeriesData.isEmpty()) {
         Box(modifier = modifier.fillMaxSize().background(Color.White), contentAlignment = androidx.compose.ui.Alignment.Center) {
@@ -45,14 +49,14 @@ fun ChartRenderer(
     val daysInMonth = today.daysInMonth
     val daysPassed = today.dayOfMonth
 
-    val extrapolatedSeriesData = activeSeriesData.map { series ->
-        val parsedBuckets = series.data!!.getParsedBuckets().toMutableMap()
+    val extrapolatedSeriesData = activeSeriesData.map { (series, buckets) ->
+        val parsedBuckets = buckets.toMutableMap()
         if (parsedBuckets.containsKey(currentMonthKey) && daysPassed > 0) {
             val currentValue = parsedBuckets[currentMonthKey] ?: 0
             val extrapolatedValue = (currentValue.toDouble() / daysPassed * daysInMonth).toInt()
             parsedBuckets[currentMonthKey] = extrapolatedValue
         }
-        series to parsedBuckets
+        SeriesBuckets(series, parsedBuckets)
     }
 
     val textMeasurer = rememberTextMeasurer()
@@ -68,7 +72,7 @@ fun ChartRenderer(
         val graphHeight = height - 2 * paddingY
 
         // Collect all buckets to find global min/max for axes scaling
-        val rawKeys = extrapolatedSeriesData.flatMap { it.second.keys }.distinct().sorted()
+        val rawKeys = extrapolatedSeriesData.flatMap { it.buckets.keys }.distinct().sorted()
         
         val completeKeys = mutableListOf<String>()
         if (rawKeys.isNotEmpty()) {
@@ -96,7 +100,7 @@ fun ChartRenderer(
             }
         }
 
-        val maxCount = extrapolatedSeriesData.flatMap { it.second.values }.maxOrNull()?.coerceAtLeast(1) ?: 1
+        val maxCount = extrapolatedSeriesData.flatMap { it.buckets.values }.maxOrNull()?.coerceAtLeast(1) ?: 1
 
         val stepX = if (completeKeys.size > 1) graphWidth / (completeKeys.size - 1) else graphWidth
         val scaleY = graphHeight / maxCount

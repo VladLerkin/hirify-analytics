@@ -147,12 +147,12 @@ class AiSettingsScreen : Screen {
                             onClick = { presetsExpanded = true },
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text(presets.getOrNull(selectedPresetIndex)?.first ?: strings.selectPreset)
+                            Text(presets.getOrNull(selectedPresetIndex)?.name ?: strings.selectPreset)
                         }
                         DropdownMenu(
                             expanded = presetsExpanded,
                             onDismissRequest = { presetsExpanded = false },
-                            modifier = Modifier.fillMaxWidth(0.9f)
+                            modifier = Modifier.fillMaxWidth(0.9f).heightIn(max = 300.dp)
                         ) {
                             presets.forEachIndexed { index, (name, preset) ->
                                 DropdownMenuItem(
@@ -317,7 +317,7 @@ class AiSettingsScreen : Screen {
                         value = model,
                         onValueChange = { model = it },
                         label = { Text(strings.modelLabel) },
-                        placeholder = { Text("gpt-4o-mini") },
+                        placeholder = { Text("gpt-6-luna") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 12.dp),
@@ -343,7 +343,7 @@ class AiSettingsScreen : Screen {
                     )
                     
                     var transcriptionExpanded by remember { mutableStateOf(false) }
-                    val transcriptionProviders = listOf(
+                    val transcriptionProviders = mapOf(
                         "OPENAI_WHISPER" to strings.openaiWhisperProvider,
                         "SHERPA_LOCAL" to strings.sherpaLocalProvider,
                         "GOOGLE_SPEECH" to strings.googleSpeechProvider,
@@ -354,12 +354,12 @@ class AiSettingsScreen : Screen {
                             onClick = { transcriptionExpanded = true },
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text(transcriptionProviders.find { it.first == transcriptionProvider }?.second ?: strings.selectProvider)
+                            Text(transcriptionProviders[transcriptionProvider] ?: strings.selectProvider)
                         }
                         DropdownMenu(
                             expanded = transcriptionExpanded,
                             onDismissRequest = { transcriptionExpanded = false },
-                            modifier = Modifier.fillMaxWidth(0.9f)
+                            modifier = Modifier.fillMaxWidth(0.9f).heightIn(max = 300.dp)
                         ) {
                             transcriptionProviders.forEach { (id, name) ->
                                 DropdownMenuItem(
@@ -568,7 +568,7 @@ class AiSettingsScreen : Screen {
                                     if (sttEquivalentProvider != null) {
                                         val defaultModelForStt = when (sttEquivalentProvider) {
                                             "GOOGLE" -> "gemini-2.5-flash"
-                                            "OPENAI" -> "gpt-4o-mini"
+                                            "OPENAI" -> "gpt-6-luna"
                                             else -> currentConfig.model
                                         }
                                         val sttConfig = currentConfig.copy(

@@ -1,5 +1,11 @@
 # Hirify Analytics Release Notes
 
+## v1.0.49 (October 2026)
+* **OpenAI Model Migration:** Replaced the retiring `gpt-4o-mini` (API shutdown 2027-01-14) with `gpt-6-luna` in the preset, defaults and connection test. Settings saved with `gpt-4o-mini` are migrated automatically on load, API keys are kept. OpenAI requests now send `reasoning_effort=none` (GPT-6 only) so tools keep working, and `max_completion_tokens` instead of `max_tokens`.
+* **Android Voice Fix:** Google Speech recording on Android now uses `AudioRecord` (16 kHz mono WAV) instead of `MediaRecorder` with a non-existent FLAC encoder, which failed immediately with "Invalid audio encoder".
+* **iOS Crash Fix:** Dropdown menus in AI settings no longer crash in landscape (infinite height constraint); their height is now capped.
+* **Kotlin Refactoring:** Shared `WavAudio` helper replaces ~200 lines of duplicated CAF-to-WAV code in the Whisper and Google Speech clients; `Pair`/`Triple` replaced by `AiPreset` and small data classes; removed `!!` in chart, label and Sherpa code; dropped an unneeded `@OptIn` for Base64.
+
 ## v1.0.48 (October 2026)
 * **iOS Linker Warning Fix:** Raised iOS deployment target from `18.0` to `18.5` to match the Kotlin/Native `libicu` object and remove the "built for newer iOS-simulator version" linker warning.
 

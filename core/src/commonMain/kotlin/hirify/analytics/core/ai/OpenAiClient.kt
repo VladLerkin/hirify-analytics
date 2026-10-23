@@ -29,7 +29,12 @@ class OpenAiClient : BaseAiClient() {
         val baseUrl = config.baseUrl.ifBlank { "https://api.openai.com/v1" }
         val url = "$baseUrl/chat/completions"
 
-        val requestBody = OpenAiCompatibleJson.buildChatRequest(messages, config, tools).toString()
+        val requestBody = OpenAiCompatibleJson.buildChatRequest(
+            messages, config, tools,
+            maxTokensField = "max_completion_tokens",
+            // Only GPT-6 needs it for tools; older models reject the parameter.
+            reasoningEffort = "none".takeIf { config.model.startsWith("gpt-6") }
+        ).toString()
         println("[AI-DEBUG] OpenAI Request JSON: $requestBody")
 
         for (attempt in 1..MAX_ATTEMPTS) {

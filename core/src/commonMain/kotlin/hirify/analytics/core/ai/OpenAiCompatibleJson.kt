@@ -17,15 +17,25 @@ import kotlinx.serialization.json.putJsonObject
  */
 internal object OpenAiCompatibleJson {
 
-    /** Builds a `/chat/completions` request body. */
+    /**
+     * Builds a `/chat/completions` request body.
+     *
+     * @param maxTokensField name of the output limit field: `max_tokens` for generic compatible
+     *   servers, `max_completion_tokens` for OpenAI's current models.
+     * @param reasoningEffort sent as `reasoning_effort` when set (OpenAI GPT-6 only allows tools
+     *   on Chat Completions with `none`).
+     */
     fun buildChatRequest(
         messages: List<AiMessage>,
         config: AiConfig,
-        tools: List<AiToolDescriptor>
+        tools: List<AiToolDescriptor>,
+        maxTokensField: String = "max_tokens",
+        reasoningEffort: String? = null
     ): JsonObject = buildJsonObject {
         put("model", config.model)
         put("temperature", config.temperature)
-        put("max_tokens", config.maxTokens)
+        put(maxTokensField, config.maxTokens)
+        reasoningEffort?.let { put("reasoning_effort", it) }
         putJsonArray("messages") {
             for (msg in messages) addJsonObject {
                 put("role", msg.role)
