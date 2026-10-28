@@ -25,7 +25,7 @@ val chartColors = listOf(
     Color(0xFF9C27B0)  // Purple
 )
 
-private data class SeriesBuckets(val series: ChartSeries, val buckets: Map<String, Int>)
+private data class SeriesBuckets(val series: ChartSeries, val originalIndex: Int, val buckets: Map<String, Int>)
 
 @OptIn(ExperimentalTextApi::class)
 @Composable
@@ -33,8 +33,8 @@ fun ChartRenderer(
     seriesList: List<ChartSeries>,
     modifier: Modifier = Modifier
 ) {
-    val activeSeriesData = seriesList.mapNotNull { series ->
-        series.data?.getParsedBuckets()?.takeIf { it.isNotEmpty() }?.let { SeriesBuckets(series, it) }
+    val activeSeriesData = seriesList.mapIndexedNotNull { index, series ->
+        series.data?.getParsedBuckets()?.takeIf { it.isNotEmpty() }?.let { SeriesBuckets(series, index, it) }
     }
     
     if (activeSeriesData.isEmpty()) {
@@ -49,14 +49,14 @@ fun ChartRenderer(
     val daysInMonth = today.daysInMonth
     val daysPassed = today.dayOfMonth
 
-    val extrapolatedSeriesData = activeSeriesData.map { (series, buckets) ->
+    val extrapolatedSeriesData = activeSeriesData.map { (series, originalIndex, buckets) ->
         val parsedBuckets = buckets.toMutableMap()
         if (parsedBuckets.containsKey(currentMonthKey) && daysPassed > 0) {
             val currentValue = parsedBuckets[currentMonthKey] ?: 0
             val extrapolatedValue = (currentValue.toDouble() / daysPassed * daysInMonth).toInt()
             parsedBuckets[currentMonthKey] = extrapolatedValue
         }
-        SeriesBuckets(series, parsedBuckets)
+        SeriesBuckets(series, originalIndex, parsedBuckets)
     }
 
     val textMeasurer = rememberTextMeasurer()
@@ -168,10 +168,10 @@ fun ChartRenderer(
         }
 
         // Draw lines for each series
-        extrapolatedSeriesData.forEachIndexed { seriesIndex, (series, buckets) ->
-            if (buckets.isEmpty()) return@forEachIndexed
+        extrapolatedSeriesData.forEach { (series, originalIndex, buckets) ->
+            if (buckets.isEmpty()) return@forEach
             
-            val lineColor = chartColors[seriesIndex % chartColors.size]
+            val lineColor = chartColors[originalIndex % chartColors.size]
             val solidPath = Path()
             val dashedPath = Path()
             

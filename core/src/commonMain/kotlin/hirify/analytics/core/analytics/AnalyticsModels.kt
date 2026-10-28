@@ -29,6 +29,18 @@ data class VacancyFilter(
     val country: String? = null,
     val groupBy: String? = "month"
 ) {
+    /**
+     * True if at least one criterion narrows the result set. Without it the API returns
+     * the whole market, which is a heavy request and dwarfs other series on a shared Y axis.
+     * Service params (dateField, status, includeScam, skillsMatchType, groupBy) don't narrow.
+     */
+    val hasNarrowingCriteria: Boolean
+        get() = (status != null && status != "all") || (includeScam == true) || listOf(
+            dateFrom, dateTo, macroregion, remoteType, source, sourceSecondary, specializations,
+            grade, skills, title, companyType, employeeType, workFormat, vacancyLanguage,
+            englishLevel, country
+        ).any { !it.isNullOrBlank() }
+
     fun toHirifyWebUrl(): String {
         val baseUrl = "https://hirify.me/"
         val params = mutableListOf<String>()

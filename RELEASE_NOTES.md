@@ -1,5 +1,11 @@
 # Hirify Analytics Release Notes
 
+## v1.0.50 (October 2026)
+* **Query Optimization & Filter Guard:** Empty or non-narrowing series no longer trigger heavy full-market requests that skew comparative charts; the UI prompts the user to select filters.
+* **Race Condition & Cancellation Fix:** Superseded series requests are automatically cancelled on filter change or tab deletion, and stale responses are safely dropped.
+* **Chart Color Consistency:** Fixed line series rendering to preserve tab color mapping even when intermediate tabs have no data.
+* **Desktop UI Improvements:** Enhanced series tab sizing, padding, and label handling for desktop viewports.
+
 ## v1.0.49 (October 2026)
 * **OpenAI Model Migration:** Replaced the retiring `gpt-4o-mini` (API shutdown 2027-01-14) with `gpt-6-luna` in the preset, defaults and connection test. Settings saved with `gpt-4o-mini` are migrated automatically on load, API keys are kept. OpenAI requests now send `reasoning_effort=none` (GPT-6 only) so tools keep working, and `max_completion_tokens` instead of `max_tokens`.
 * **Android Voice Fix:** Google Speech recording on Android now uses `AudioRecord` (16 kHz mono WAV) instead of `MediaRecorder` with a non-existent FLAC encoder, which failed immediately with "Invalid audio encoder".

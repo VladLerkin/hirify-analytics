@@ -22,6 +22,8 @@ interface AppStrings {
     // Sidebar
     val configureSources: String
     val reset: String
+    val selectFiltersHint: String
+    val newSeries: String
     val workFormat: String
     val workFormatTooltip: String
     val remote: String
@@ -170,6 +172,8 @@ object EnStrings : AppStrings {
     
     // Sidebar
     override val configureSources = "Configure sources"
+    override val selectFiltersHint = "Select filters on the left (skills, specialization, grade…) to build a chart for this tab"
+    override val newSeries = "New chart"
     override val reset = "Reset"
     override val workFormat = "Work format"
     override val workFormatTooltip = "Select format: remote work, hybrid format (a few days in the office) or fully onsite"
@@ -315,7 +319,9 @@ object RuStrings : AppStrings {
     
     // Sidebar
     override val configureSources = "Настроить источники"
+    override val selectFiltersHint = "Выберите фильтры слева (навыки, специализация, грейд…), чтобы построить график для этой вкладки"
     override val reset = "Сбросить"
+    override val newSeries = "Новый график"
     override val workFormat = "Формат работы"
     override val workFormatTooltip = "Выберите формат: удаленная работа, гибридный формат (несколько дней в офисе) или полностью в офисе"
     override val remote = "Удаленно"

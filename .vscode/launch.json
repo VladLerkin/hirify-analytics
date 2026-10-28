@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Attach to Desktop (5005)",
+            "request": "attach",
+            "hostName": "localhost",
+            "port": 5005
+        },
+        {
+            "type": "kotlin",
+            "name": "Attach to Desktop (Kotlin, 5005)",
+            "request": "attach",
+            "hostName": "localhost",
+            "port": 5005,
+            "timeout": 5000,
+            "projectRoot": "${workspaceFolder}"
+        }
+    ]
+}

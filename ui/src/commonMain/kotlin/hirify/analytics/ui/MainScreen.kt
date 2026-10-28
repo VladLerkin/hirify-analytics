@@ -199,16 +199,17 @@ fun MainScreen() {
                         state.seriesList.forEachIndexed { index, series ->
                             val color = hirify.analytics.ui.render.chartColors[index % hirify.analytics.ui.render.chartColors.size]
                             val isSelected = state.activeSeriesIndex == index
+                            val tabHeight = if (PlatformEnv.isDesktop) 40.dp else 32.dp
                             
                             Surface(
                                 shape = MaterialTheme.shapes.small,
-                                color = if (isSelected) color.copy(alpha = 0.1f) else Color.Transparent,
-                                border = androidx.compose.foundation.BorderStroke(1.dp, if (isSelected) color else MaterialTheme.colorScheme.outlineVariant),
-                                modifier = Modifier.padding(4.dp).height(32.dp)
+                                color = if (isSelected) color.copy(alpha = 0.12f) else Color.Transparent,
+                                border = androidx.compose.foundation.BorderStroke(if (isSelected) 1.5.dp else 1.dp, if (isSelected) color else MaterialTheme.colorScheme.outlineVariant),
+                                modifier = Modifier.padding(4.dp).height(tabHeight)
                             ) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.padding(horizontal = 12.dp).clickable {
+                                    modifier = Modifier.padding(horizontal = if (PlatformEnv.isDesktop) 14.dp else 12.dp).clickable {
                                         if (isSelected && isPortrait) {
                                             isSidebarVisible = true
                                         } else {
@@ -216,21 +217,29 @@ fun MainScreen() {
                                         }
                                     }
                                 ) {
-                                    Box(modifier = Modifier.size(8.dp).background(color, androidx.compose.foundation.shape.CircleShape))
-                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Box(modifier = Modifier.size(if (PlatformEnv.isDesktop) 10.dp else 8.dp).background(color, androidx.compose.foundation.shape.CircleShape))
+                                    Spacer(modifier = Modifier.width(if (PlatformEnv.isDesktop) 10.dp else 8.dp))
                                     Text(
                                         text = series.filter.toShortLabel(strings),
                                         color = if (isSelected) color else MaterialTheme.colorScheme.onSurface,
-                                        style = MaterialTheme.typography.labelLarge
+                                        style = if (PlatformEnv.isDesktop) MaterialTheme.typography.titleSmall else MaterialTheme.typography.labelLarge
                                     )
                                     if (series.isLoading) {
                                         Spacer(modifier = Modifier.width(8.dp))
-                                        CircularProgressIndicator(modifier = Modifier.size(12.dp), color = color, strokeWidth = 2.dp)
+                                        CircularProgressIndicator(modifier = Modifier.size(if (PlatformEnv.isDesktop) 14.dp else 12.dp), color = color, strokeWidth = 2.dp)
                                     }
                                     if (state.seriesList.size > 1) {
-                                        Spacer(modifier = Modifier.width(4.dp))
-                                        IconButton(onClick = { viewModel.removeSeries(index) }, modifier = Modifier.size(16.dp)) {
-                                            Icon(Icons.Default.Close, contentDescription = "Remove", tint = if (isSelected) color else MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Spacer(modifier = Modifier.width(if (PlatformEnv.isDesktop) 6.dp else 4.dp))
+                                        IconButton(
+                                            onClick = { viewModel.removeSeries(index) }, 
+                                            modifier = Modifier.size(if (PlatformEnv.isDesktop) 20.dp else 16.dp)
+                                        ) {
+                                            Icon(
+                                                Icons.Default.Close, 
+                                                contentDescription = "Remove", 
+                                                tint = if (isSelected) color else MaterialTheme.colorScheme.onSurfaceVariant,
+                                                modifier = Modifier.size(if (PlatformEnv.isDesktop) 14.dp else 12.dp)
+                                            )
                                         }
                                     }
                                 }
@@ -238,21 +247,41 @@ fun MainScreen() {
                         }
                         
                         if (state.seriesList.size < 5) {
-                            IconButton(onClick = { viewModel.addSeries() }, modifier = Modifier.padding(4.dp)) {
-                                Icon(Icons.Default.Add, contentDescription = "Add Series")
+                            IconButton(
+                                onClick = { viewModel.addSeries() }, 
+                                modifier = Modifier.padding(4.dp).size(if (PlatformEnv.isDesktop) 40.dp else 32.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.Add, 
+                                    contentDescription = "Add Series",
+                                    modifier = Modifier.size(if (PlatformEnv.isDesktop) 22.dp else 18.dp)
+                                )
                             }
                         }
                     }
                     
                     Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
                         val activeSeries = state.seriesList.getOrNull(state.activeSeriesIndex)
+                        val activeNeedsFilters = activeSeries?.filter?.hasNarrowingCriteria == false
+                        val anySeriesHasData = state.seriesList.any { it.data != null }
                         if (activeSeries?.error != null) {
                             Text(text = activeSeries.error, color = MaterialTheme.colorScheme.error, modifier = Modifier.align(Alignment.Center))
+                        } else if (activeNeedsFilters && !anySeriesHasData) {
+                            SelectFiltersHint(
+                                text = strings.selectFiltersHint,
+                                modifier = Modifier.align(Alignment.Center).padding(24.dp)
+                            )
                         } else {
                             ChartRenderer(
                                 seriesList = state.seriesList,
                                 modifier = Modifier.fillMaxSize()
                             )
+                            if (activeNeedsFilters) {
+                                SelectFiltersHint(
+                                    text = strings.selectFiltersHint,
+                                    modifier = Modifier.align(Alignment.TopCenter).padding(top = 8.dp, start = 24.dp, end = 24.dp)
+                                )
+                            }
                         }
                     }
                 }
@@ -264,6 +293,33 @@ fun MainScreen() {
 
 private fun String?.firstItemOrNull(): String? =
     if (isNullOrEmpty()) null else substringBefore(',').trim()
+
+@Composable
+private fun SelectFiltersHint(text: String, modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier,
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.secondaryContainer,
+        tonalElevation = 1.dp
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                Icons.Default.Info,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSecondaryContainer
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSecondaryContainer
+            )
+        }
+    }
+}
 
 fun VacancyFilter.toShortLabel(strings: hirify.analytics.ui.i18n.AppStrings): String {
     val parts = mutableListOf<String>()
@@ -284,7 +340,8 @@ fun VacancyFilter.toShortLabel(strings: hirify.analytics.ui.i18n.AppStrings): St
         parts.add(mappedGrade)
     }
     
-    if (parts.isEmpty()) return strings.allVacancies
+    if (parts.isEmpty()) return if (hasNarrowingCriteria) strings.allVacancies else strings.newSeries
     val fullLabel = parts.joinToString(", ")
-    return if (fullLabel.length > 20) fullLabel.take(17) + "..." else fullLabel
+    val maxLen = if (PlatformEnv.isDesktop) 30 else 20
+    return if (fullLabel.length > maxLen) fullLabel.take(maxLen - 3) + "..." else fullLabel
 }

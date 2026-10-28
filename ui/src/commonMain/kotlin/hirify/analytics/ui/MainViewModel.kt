@@ -7,11 +7,13 @@ import hirify.analytics.core.analytics.CountResponse
 import hirify.analytics.core.analytics.HirifyApiClient
 import hirify.analytics.core.analytics.VacancyFilter
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 
 data class ChartSeries(
@@ -36,6 +38,9 @@ class MainViewModel(
 
     val state: StateFlow<MainState>
         field = MutableStateFlow(MainState())
+
+    /** In-flight load per series id; a newer load cancels the previous one so stale responses can't overwrite fresh data. */
+    private val loadJobs = mutableMapOf<Long, Job>()
 
     init {
         loadDataForSeries(0)
@@ -66,6 +71,13 @@ class MainViewModel(
         }
     }
 
+    /** Applies [transform] to the series with [id], ignoring series that no longer exist. */
+    private inline fun updateSeriesById(id: Long, crossinline transform: (ChartSeries) -> ChartSeries) {
+        state.update { current ->
+            current.copy(seriesList = current.seriesList.map { if (it.id == id) transform(it) else it })
+        }
+    }
+
     fun addSeries() {
         if (state.value.seriesList.size >= 5) return
         state.update { state ->
@@ -77,6 +89,7 @@ class MainViewModel(
 
     fun removeSeries(index: Int) {
         if (state.value.seriesList.size <= 1) return
+        state.value.seriesList.getOrNull(index)?.let { loadJobs.remove(it.id)?.cancel() }
         state.update { state ->
             val newList = state.seriesList.toMutableList().apply { removeAt(index) }
             val newActiveIndex = if (state.activeSeriesIndex >= newList.size) newList.lastIndex else state.activeSeriesIndex
@@ -100,15 +113,30 @@ class MainViewModel(
     }
 
     private fun loadDataForSeries(index: Int) {
-        if (index !in state.value.seriesList.indices) return
+        val series = state.value.seriesList.getOrNull(index) ?: return
+        val id = series.id
+        val filter = series.filter
 
-        viewModelScope.launch(Dispatchers.Default) {
-            updateSeries(index) { it.copy(isLoading = true, error = null) }
+        loadJobs.remove(id)?.cancel()
+        if (!filter.hasNarrowingCriteria) {
+            // Don't fetch the whole market: the UI prompts the user to pick filters instead.
+            updateSeriesById(id) { it.copy(data = null, isLoading = false, error = null) }
+            return
+        }
+        loadJobs[id] = viewModelScope.launch(Dispatchers.Default) {
+            updateSeriesById(id) { it.copy(isLoading = true, error = null) }
 
-            val filter = state.value.seriesList[index].filter
-            apiClient.getAnalyticsCount(filter)
-                .onSuccess { response -> updateSeries(index) { it.copy(data = response, isLoading = false) } }
-                .onFailure { error -> updateSeries(index) { it.copy(error = error.message, isLoading = false) } }
+            val result = apiClient.getAnalyticsCount(filter)
+            // getAnalyticsCount swallows CancellationException, so bail out explicitly if superseded.
+            ensureActive()
+            // Drop the response if the series' filter changed while the request was in flight.
+            updateSeriesById(id) { current ->
+                if (current.filter != filter) return@updateSeriesById current
+                result.fold(
+                    onSuccess = { current.copy(data = it, isLoading = false) },
+                    onFailure = { current.copy(error = it.message, isLoading = false) }
+                )
+            }
         }
     }
 }
