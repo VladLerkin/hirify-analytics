@@ -1,5 +1,8 @@
 # Hirify Analytics Release Notes
 
+## v1.0.51 (October 2026)
+* **Dependency Updates:** Updated Android Gradle Plugin (AGP) to `9.5.0`.
+
 ## v1.0.50 (October 2026)
 * **Query Optimization & Filter Guard:** Empty or non-narrowing series no longer trigger heavy full-market requests that skew comparative charts; the UI prompts the user to select filters.
 * **Race Condition & Cancellation Fix:** Superseded series requests are automatically cancelled on filter change or tab deletion, and stale responses are safely dropped.
