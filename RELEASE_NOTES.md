@@ -1,5 +1,8 @@
 # Hirify Analytics Release Notes
 
+## v1.0.52 (November 2026)
+* **Dependency Updates:** Updated Android Gradle Plugin (AGP) to `9.5.1` and Ktor to `3.6.1`.
+
 ## v1.0.51 (October 2026)
 * **Dependency Updates:** Updated Android Gradle Plugin (AGP) to `9.5.0`.
 
