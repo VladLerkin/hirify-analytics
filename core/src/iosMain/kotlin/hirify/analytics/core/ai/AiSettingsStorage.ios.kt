@@ -35,6 +35,8 @@ actual class AiSettingsStorage {
         defaults.setInteger(config.maxTokens.toLong(), KEY_MAX_TOKENS)
         defaults.setObject(config.language, KEY_LANGUAGE)
         defaults.setObject(config.transcriptionProvider, KEY_TRANSCRIPTION_PROVIDER)
+        defaults.setObject(config.chartPeriod, KEY_CHART_PERIOD)
+        defaults.setObject(config.interfaceLanguage, KEY_INTERFACE_LANGUAGE)
         // Save Google API key to Keychain for security (deprecated)
         if (config.googleApiKey.isNotBlank()) {
             saveToKeychain(KEYCHAIN_KEY_GOOGLE_API_KEY, config.googleApiKey)
@@ -112,6 +114,8 @@ actual class AiSettingsStorage {
 
             googleAiApiKey = googleAiApiKey,
             hirifyApiKey = hirifyApiKey,
+            interfaceLanguage = defaults.stringForKey(KEY_INTERFACE_LANGUAGE) ?: "ru",
+            chartPeriod = defaults.stringForKey(KEY_CHART_PERIOD) ?: "all"
         ).withMigratedModel()
     }
     
@@ -124,6 +128,8 @@ actual class AiSettingsStorage {
         defaults.removeObjectForKey(KEY_MAX_TOKENS)
         defaults.removeObjectForKey(KEY_LANGUAGE)
         defaults.removeObjectForKey(KEY_TRANSCRIPTION_PROVIDER)
+        defaults.removeObjectForKey(KEY_CHART_PERIOD)
+        defaults.removeObjectForKey(KEY_INTERFACE_LANGUAGE)
         deleteFromKeychain(KEYCHAIN_KEY_GOOGLE_API_KEY)
         
         // Remove new keys from Keychain
@@ -274,6 +280,8 @@ actual class AiSettingsStorage {
         private const val KEY_MAX_TOKENS = "ai_max_tokens"
         private const val KEY_LANGUAGE = "ai_language"
         private const val KEY_TRANSCRIPTION_PROVIDER = "ai_transcription_provider"
+        private const val KEY_CHART_PERIOD = "ai_chart_period"
+        private const val KEY_INTERFACE_LANGUAGE = "ai_interface_language"
         
         // Keychain keys for API keys
         private const val KEYCHAIN_KEY_API_KEY = "hirify.analytics.ai_api_key"

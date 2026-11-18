@@ -13,6 +13,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.currentOrThrow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -21,6 +22,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.ui.platform.LocalUriHandler
+import hirify.analytics.core.analytics.ChartPeriod
 import hirify.analytics.ui.components.panels.LeftSidebar
 import hirify.analytics.ui.render.ChartRenderer
 import org.koin.compose.koinInject
@@ -260,6 +262,53 @@ fun MainScreen() {
                         }
                     }
                     
+                    // Chart Period Selector
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 6.dp),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "${strings.chartPeriod}:",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        ChartPeriod.entries.forEach { period ->
+                            val isSelected = state.chartPeriod == period
+                            val label = when (period) {
+                                ChartPeriod.ALL -> strings.periodAll
+                                ChartPeriod.LAST_2_MONTHS -> strings.period2Months
+                                ChartPeriod.LAST_3_MONTHS -> strings.period3Months
+                                ChartPeriod.LAST_6_MONTHS -> strings.period6Months
+                                ChartPeriod.LAST_12_MONTHS -> strings.period1Year
+                            }
+                            Surface(
+                                shape = MaterialTheme.shapes.small,
+                                color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
+                                contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
+                                border = if (isSelected) null else androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                                modifier = Modifier.padding(horizontal = 2.dp).height(28.dp)
+                            ) {
+                                Box(
+                                    contentAlignment = Alignment.Center,
+                                    modifier = Modifier
+                                        .clickable { viewModel.setChartPeriod(period) }
+                                        .padding(horizontal = 8.dp)
+                                        .fillMaxHeight()
+                                ) {
+                                    Text(
+                                        text = label,
+                                        fontSize = 12.sp,
+                                        fontWeight = if (isSelected) androidx.compose.ui.text.font.FontWeight.Bold else androidx.compose.ui.text.font.FontWeight.Normal
+                                    )
+                                }
+                            }
+                        }
+                    }
+
                     Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
                         val activeSeries = state.seriesList.getOrNull(state.activeSeriesIndex)
                         val activeNeedsFilters = activeSeries?.filter?.hasNarrowingCriteria == false
@@ -274,6 +323,7 @@ fun MainScreen() {
                         } else {
                             ChartRenderer(
                                 seriesList = state.seriesList,
+                                period = state.chartPeriod,
                                 modifier = Modifier.fillMaxSize()
                             )
                             if (activeNeedsFilters) {

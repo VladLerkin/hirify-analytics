@@ -18,6 +18,7 @@ class MainWorkspaceScreen : Screen {
         val state by viewModel.state.collectAsState()
         
         DisposableEffect(Unit) {
+            viewModel.syncSettings()
             viewModel.reload()
             onDispose { }
         }

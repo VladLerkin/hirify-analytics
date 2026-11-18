@@ -20,6 +20,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import hirify.analytics.core.ai.AiConfig
 import hirify.analytics.core.ai.AiPresets
+import hirify.analytics.core.analytics.ChartPeriod
 import hirify.analytics.core.ai.AiSettingsStorage
 import hirify.analytics.core.ai.AiClientFactory
 import hirify.analytics.core.ai.sendPromptSafe
@@ -60,6 +61,7 @@ class AiSettingsScreen : Screen {
         var googleKey by remember { mutableStateOf(initialConfig.googleAiApiKey) }
         var hirifyKey by remember { mutableStateOf(initialConfig.hirifyApiKey) }
         var interfaceLanguage by remember { mutableStateOf(initialConfig.interfaceLanguage) }
+        var chartPeriod by remember { mutableStateOf(initialConfig.chartPeriod) }
         val scope = rememberCoroutineScope()
         
         val strings = LocalAppStrings.current
@@ -90,7 +92,8 @@ class AiSettingsScreen : Screen {
                                 openaiApiKey = openAiKey,
                                 googleAiApiKey = googleKey,
                                 hirifyApiKey = hirifyKey,
-                                interfaceLanguage = interfaceLanguage
+                                interfaceLanguage = interfaceLanguage,
+                                chartPeriod = chartPeriod
                             )
                             storage.saveConfig(config)
                             navigator.pop()
@@ -493,6 +496,40 @@ class AiSettingsScreen : Screen {
                             }
                         }
                     }
+
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
+                        Text(strings.chartPeriod, modifier = Modifier.weight(1f))
+                        var periodExpanded by remember { mutableStateOf(false) }
+                        Box {
+                            OutlinedButton(onClick = { periodExpanded = true }) {
+                                Text(when (ChartPeriod.fromStorageKey(chartPeriod)) {
+                                    ChartPeriod.ALL -> strings.periodAll
+                                    ChartPeriod.LAST_2_MONTHS -> strings.period2Months
+                                    ChartPeriod.LAST_3_MONTHS -> strings.period3Months
+                                    ChartPeriod.LAST_6_MONTHS -> strings.period6Months
+                                    ChartPeriod.LAST_12_MONTHS -> strings.period1Year
+                                })
+                            }
+                            DropdownMenu(expanded = periodExpanded, onDismissRequest = { periodExpanded = false }) {
+                                ChartPeriod.entries.forEach { p ->
+                                    val label = when (p) {
+                                        ChartPeriod.ALL -> strings.periodAll
+                                        ChartPeriod.LAST_2_MONTHS -> strings.period2Months
+                                        ChartPeriod.LAST_3_MONTHS -> strings.period3Months
+                                        ChartPeriod.LAST_6_MONTHS -> strings.period6Months
+                                        ChartPeriod.LAST_12_MONTHS -> strings.period1Year
+                                    }
+                                    DropdownMenuItem(
+                                        text = { Text(label) },
+                                        onClick = {
+                                            chartPeriod = p.storageKey
+                                            periodExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
                     
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(bottom = 48.dp),
@@ -545,7 +582,8 @@ class AiSettingsScreen : Screen {
                                         openaiApiKey = openAiKey,
                                         googleAiApiKey = googleKey,
                                         hirifyApiKey = hirifyKey,
-                                        interfaceLanguage = interfaceLanguage
+                                        interfaceLanguage = interfaceLanguage,
+                                        chartPeriod = chartPeriod
                                     )
                                     val client = aiClientFactory.createClient(currentConfig)
                                     val llmResult = client.sendPromptSafe("Hello, are you there?", currentConfig)

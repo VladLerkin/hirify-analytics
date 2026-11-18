@@ -1,5 +1,10 @@
 # Hirify Analytics Release Notes
 
+## v1.0.53 (November 2026)
+* **Configurable Chart Period:** Added the ability to choose the chart display range (Last 2 Months, 3 Months, 6 Months, 1 Year, or All Time) via a dropdown in Settings and quick-switch chips directly above the chart.
+* **Dynamic Chart Rescaling:** The Y-axis max scale now recalculates automatically based only on data within the selected time window, enhancing trend readability without distortion from historical outliers.
+* **Dependency Updates:** Updated `kotlinx-serialization` to `1.13.0`.
+
 ## v1.0.52 (November 2026)
 * **Dependency Updates:** Updated Android Gradle Plugin (AGP) to `9.5.1` and Ktor to `3.6.1`.
 

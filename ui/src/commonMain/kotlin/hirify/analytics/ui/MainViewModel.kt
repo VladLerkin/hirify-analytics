@@ -2,7 +2,9 @@ package hirify.analytics.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import hirify.analytics.core.ai.AiSettingsStorage
 import hirify.analytics.core.ai.VoiceInputProcessor
+import hirify.analytics.core.analytics.ChartPeriod
 import hirify.analytics.core.analytics.CountResponse
 import hirify.analytics.core.analytics.HirifyApiClient
 import hirify.analytics.core.analytics.VacancyFilter
@@ -26,18 +28,22 @@ data class ChartSeries(
 
 data class MainState(
         val seriesList: List<ChartSeries> = listOf(ChartSeries()),
-        val activeSeriesIndex: Int = 0
+        val activeSeriesIndex: Int = 0,
+        val chartPeriod: ChartPeriod = ChartPeriod.ALL
 )
 
 class MainViewModel(
         private val apiClient: HirifyApiClient,
+        private val aiSettingsStorage: AiSettingsStorage,
         voiceInputProcessorFactory: (CoroutineScope) -> VoiceInputProcessor
 ) : ViewModel() {
 
     val voiceInputProcessor = voiceInputProcessorFactory(viewModelScope)
 
     val state: StateFlow<MainState>
-        field = MutableStateFlow(MainState())
+        field = MutableStateFlow(
+            MainState(chartPeriod = ChartPeriod.fromStorageKey(aiSettingsStorage.loadConfig().chartPeriod))
+        )
 
     /** In-flight load per series id; a newer load cancels the previous one so stale responses can't overwrite fresh data. */
     private val loadJobs = mutableMapOf<Long, Job>()
@@ -52,6 +58,21 @@ class MainViewModel(
                     voiceInputProcessor.clearResult()
                 }
             }
+        }
+    }
+
+    fun setChartPeriod(period: ChartPeriod) {
+        state.update { it.copy(chartPeriod = period) }
+        val currentConfig = aiSettingsStorage.loadConfig()
+        if (currentConfig.chartPeriod != period.storageKey) {
+            aiSettingsStorage.saveConfig(currentConfig.copy(chartPeriod = period.storageKey))
+        }
+    }
+
+    fun syncSettings() {
+        val savedPeriod = ChartPeriod.fromStorageKey(aiSettingsStorage.loadConfig().chartPeriod)
+        if (state.value.chartPeriod != savedPeriod) {
+            state.update { it.copy(chartPeriod = savedPeriod) }
         }
     }
 

@@ -48,6 +48,8 @@ actual class AiSettingsStorage {
 
             putString(KEY_GOOGLE_AI_API_KEY, config.googleAiApiKey)
             putString(KEY_HIRIFY_API_KEY, config.hirifyApiKey)
+            putString(KEY_CHART_PERIOD, config.chartPeriod)
+            putString(KEY_INTERFACE_LANGUAGE, config.interfaceLanguage)
             apply()
         }
     }
@@ -69,6 +71,8 @@ actual class AiSettingsStorage {
 
             googleAiApiKey = prefs.getString(KEY_GOOGLE_AI_API_KEY, "") ?: "",
             hirifyApiKey = prefs.getString(KEY_HIRIFY_API_KEY, "") ?: "",
+            interfaceLanguage = prefs.getString(KEY_INTERFACE_LANGUAGE, "ru") ?: "ru",
+            chartPeriod = prefs.getString(KEY_CHART_PERIOD, "all") ?: "all"
         ).withMigratedModel()
     }
     
@@ -110,6 +114,8 @@ actual class AiSettingsStorage {
 
         private const val KEY_GOOGLE_AI_API_KEY = "ai_google_ai_api_key"
         private const val KEY_HIRIFY_API_KEY = "ai_hirify_api_key"
+        private const val KEY_CHART_PERIOD = "ai_chart_period"
+        private const val KEY_INTERFACE_LANGUAGE = "ai_interface_language"
         
         private var appContext: Context? = null
         

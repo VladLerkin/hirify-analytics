@@ -133,6 +133,12 @@ interface AppStrings {
     val connectionSuccessful: String
     val connectionFailed: String
     val interfaceLanguage: String
+    val chartPeriod: String
+    val periodAll: String
+    val period2Months: String
+    val period3Months: String
+    val period6Months: String
+    val period1Year: String
     
     // Providers
     val openaiApiKeyLabel: String
@@ -282,6 +288,12 @@ object EnStrings : AppStrings {
     override val connectionSuccessful = "Connection successful!"
     override val connectionFailed = "Connection failed"
     override val interfaceLanguage = "Interface Language"
+    override val chartPeriod = "Chart Period"
+    override val periodAll = "All time"
+    override val period2Months = "2 months"
+    override val period3Months = "3 months"
+    override val period6Months = "6 months"
+    override val period1Year = "1 year"
     
     override val openaiApiKeyLabel = "OpenAI API Key"
     override val openaiWhisperApiKeyLabel = "OpenAI API Key (Whisper)"
@@ -429,6 +441,12 @@ object RuStrings : AppStrings {
     override val connectionSuccessful = "Подключение успешно!"
     override val connectionFailed = "Ошибка подключения"
     override val interfaceLanguage = "Язык интерфейса"
+    override val chartPeriod = "Период графиков"
+    override val periodAll = "Весь период"
+    override val period2Months = "2 месяца"
+    override val period3Months = "3 месяца"
+    override val period6Months = "6 месяцев"
+    override val period1Year = "1 год"
     
     override val openaiApiKeyLabel = "OpenAI API Ключ"
     override val openaiWhisperApiKeyLabel = "OpenAI API Ключ (Whisper)"

@@ -47,8 +47,14 @@ data class AiConfig(
     val hirifyApiKey: String = "",
     
     // Interface Language (e.g. "ru", "en")
-    val interfaceLanguage: String = "ru"
+    val interfaceLanguage: String = "ru",
+
+    // Chart Display Period (e.g. "all", "2_months", "3_months", "6_months", "12_months")
+    val chartPeriod: String = "all"
 ) {
+    fun getChartPeriod(): hirify.analytics.core.analytics.ChartPeriod =
+        hirify.analytics.core.analytics.ChartPeriod.fromStorageKey(chartPeriod)
+
     fun getProvider(): AiProvider =
         AiProvider.entries.firstOrNull { it.name == provider } ?: AiProvider.OPENAI
     

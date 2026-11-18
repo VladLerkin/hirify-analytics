@@ -21,6 +21,8 @@ actual class AiSettingsStorage {
         prefs.putInt(KEY_MAX_TOKENS, config.maxTokens)
         prefs.put(KEY_LANGUAGE, config.language)
         prefs.put(KEY_TRANSCRIPTION_PROVIDER, config.transcriptionProvider)
+        prefs.put(KEY_CHART_PERIOD, config.chartPeriod)
+        prefs.put(KEY_INTERFACE_LANGUAGE, config.interfaceLanguage)
 
         // Secrets are encrypted before saving
         putSecret(KEY_API_KEY, config.apiKey) // deprecated, kept for backward compatibility
@@ -44,7 +46,9 @@ actual class AiSettingsStorage {
         googleApiKey = getSecret(KEY_GOOGLE_API_KEY),
         openaiApiKey = getSecret(KEY_OPENAI_API_KEY),
         googleAiApiKey = getSecret(KEY_GOOGLE_AI_API_KEY),
-        hirifyApiKey = getSecret(KEY_HIRIFY_API_KEY)
+        hirifyApiKey = getSecret(KEY_HIRIFY_API_KEY),
+        interfaceLanguage = prefs.get(KEY_INTERFACE_LANGUAGE, "ru"),
+        chartPeriod = prefs.get(KEY_CHART_PERIOD, "all")
     ).withMigratedModel()
 
     actual fun clearConfig() {
@@ -114,11 +118,13 @@ actual class AiSettingsStorage {
         private const val KEY_OPENAI_API_KEY = "ai_openai_api_key"
         private const val KEY_GOOGLE_AI_API_KEY = "ai_google_ai_api_key"
         private const val KEY_HIRIFY_API_KEY = "ai_hirify_api_key"
+        private const val KEY_CHART_PERIOD = "ai_chart_period"
+        private const val KEY_INTERFACE_LANGUAGE = "ai_interface_language"
 
         private val ALL_KEYS = listOf(
             KEY_PROVIDER, KEY_API_KEY, KEY_MODEL, KEY_BASE_URL, KEY_TEMPERATURE, KEY_MAX_TOKENS,
             KEY_LANGUAGE, KEY_TRANSCRIPTION_PROVIDER, KEY_GOOGLE_API_KEY, KEY_OPENAI_API_KEY,
-            KEY_GOOGLE_AI_API_KEY, KEY_HIRIFY_API_KEY
+            KEY_GOOGLE_AI_API_KEY, KEY_HIRIFY_API_KEY, KEY_CHART_PERIOD, KEY_INTERFACE_LANGUAGE
         )
 
         private const val ALGORITHM = "AES"

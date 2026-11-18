@@ -9,6 +9,7 @@ val uiModule = module {
     single {
         MainViewModel(
                 apiClient = get(),
+                aiSettingsStorage = get(),
                 voiceInputProcessorFactory = { scope ->
                     get<VoiceInputProcessor> { parametersOf(scope) }
                 }

@@ -15,6 +15,7 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
+import hirify.analytics.core.analytics.ChartPeriod
 import hirify.analytics.ui.ChartSeries
 
 val chartColors = listOf(
@@ -31,6 +32,7 @@ private data class SeriesBuckets(val series: ChartSeries, val originalIndex: Int
 @Composable
 fun ChartRenderer(
     seriesList: List<ChartSeries>,
+    period: ChartPeriod = ChartPeriod.ALL,
     modifier: Modifier = Modifier
 ) {
     val activeSeriesData = seriesList.mapIndexedNotNull { index, series ->
@@ -77,7 +79,7 @@ fun ChartRenderer(
         val completeKeys = mutableListOf<String>()
         if (rawKeys.isNotEmpty()) {
             val minKey = rawKeys.first()
-            val maxKey = rawKeys.last()
+            val maxKey = maxOf(rawKeys.last(), currentMonthKey)
             
             val minYear = minKey.substringBefore("-").toIntOrNull() ?: 0
             val minMonth = minKey.substringAfter("-").toIntOrNull() ?: 0
@@ -100,9 +102,21 @@ fun ChartRenderer(
             }
         }
 
-        val maxCount = extrapolatedSeriesData.flatMap { it.buckets.values }.maxOrNull()?.coerceAtLeast(1) ?: 1
+        val months = period.months
+        val displayKeys = if (months != null && completeKeys.size > months) {
+            completeKeys.takeLast(months)
+        } else {
+            completeKeys
+        }
 
-        val stepX = if (completeKeys.size > 1) graphWidth / (completeKeys.size - 1) else graphWidth
+        if (displayKeys.isEmpty()) {
+            return@Canvas
+        }
+
+        val maxCount = extrapolatedSeriesData.flatMap { series -> displayKeys.map { series.buckets[it] ?: 0 } }
+            .maxOrNull()?.coerceAtLeast(1) ?: 1
+
+        val stepX = if (displayKeys.size > 1) graphWidth / (displayKeys.size - 1) else graphWidth
         val scaleY = graphHeight / maxCount
 
         // Draw axes
@@ -138,17 +152,17 @@ fun ChartRenderer(
             )
         }
 
-        val skip = maxOf(1, (completeKeys.size + 11) / 12)
+        val skip = maxOf(1, (displayKeys.size + 11) / 12)
         var lastDrawnYear = ""
 
         // Draw X labels
-        completeKeys.forEachIndexed { index, key ->
-            val x = paddingX + index * stepX
+        displayKeys.forEachIndexed { index, key ->
+            val x = if (displayKeys.size > 1) paddingX + index * stepX else paddingX + graphWidth / 2f
             val parts = key.split("-")
             val year = parts.getOrNull(0) ?: ""
             val month = parts.getOrNull(1) ?: key
 
-            if (index % skip == 0 || index == completeKeys.size - 1) {
+            if (index % skip == 0 || index == displayKeys.size - 1) {
                 val monthLayout = textMeasurer.measure(month)
                 drawText(
                     textLayoutResult = monthLayout,
@@ -178,9 +192,9 @@ fun ChartRenderer(
             var isFirst = true
             var prevX = 0f
             var prevY = 0f
-            completeKeys.forEachIndexed { index, key ->
+            displayKeys.forEachIndexed { index, key ->
                 val value = buckets[key] ?: 0
-                val x = paddingX + index * stepX
+                val x = if (displayKeys.size > 1) paddingX + index * stepX else paddingX + graphWidth / 2f
                 val y = height - paddingY - (value * scaleY)
                 
                 if (isFirst) {
